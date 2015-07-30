@@ -124,6 +124,13 @@ class Client
                 ]
             )
         );
+        $requestOptions = [];
+        if ($this->username !== '' && $this->password !== '') {
+            $requestOptions['auth'] = [$this->username, $this->password];
+        }
+        $this->driver->setRequestOptions($requestOptions);
+        
+        
     }
 
     /**

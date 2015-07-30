@@ -26,6 +26,13 @@ class Guzzle implements DriverInterface, QueryDriverInterface
     private $parameters;
 
     /**
+     * Array of optional request options added to Guzzle request
+     * 
+     * @var array
+     */
+    private $requestOptions;
+    
+    /**
      * @var Client
      */
     private $httpClient;
@@ -45,6 +52,7 @@ class Guzzle implements DriverInterface, QueryDriverInterface
     public function __construct(Client $client)
     {
         $this->httpClient = $client;
+        $this->requestOptions = [];
     }
 
     /**
@@ -67,6 +75,18 @@ class Guzzle implements DriverInterface, QueryDriverInterface
         $this->parameters = $parameters;
     }
 
+    
+    /**
+     * Set optional request options like auth parameters as described in 
+     * http://guzzle.readthedocs.org/en/latest/request-options.html
+     * 
+     * @param array $options
+     */
+    public function setRequestOptions(array $requestOptions)
+    {   
+        $this->requestOptions = $requestOptions;
+    }
+    
     /**
      * Send the data
      *
@@ -77,7 +97,9 @@ class Guzzle implements DriverInterface, QueryDriverInterface
      */
     public function write($data = null)
     {
-        $this->response = $this->httpClient->post($this->parameters['url'], ['body' => $data]);
+        $requestOptions = array_merge(['body' => $data], $this->requestOptions);
+        
+        $this->response = $this->httpClient->post($this->parameters['url'], $requestOptions);
     }
 
     /**
@@ -85,7 +107,7 @@ class Guzzle implements DriverInterface, QueryDriverInterface
      */
     public function query()
     {
-        $response = $this->httpClient->get($this->parameters['url']);
+        $response = $this->httpClient->get($this->parameters['url'], $this->requestOptions);
 
         $raw = (string) $response->getBody();
 
