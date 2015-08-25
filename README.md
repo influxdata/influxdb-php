@@ -332,6 +332,11 @@ To grant a user specific privileges on a database, provide a database object or 
 
 ## Changelog
 
+###1.0.2
+* Added support for 0.9.3 rc2
+* Changed the way we handle the datatypes of values
+* Changed list retention policies to reflect the changes in 0.9.3
+
 ####1.0.1 
 * Added support for authentication in the guzzle driver
 * Added admin functionality
