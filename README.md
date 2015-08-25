@@ -332,7 +332,7 @@ To grant a user specific privileges on a database, provide a database object or 
 
 ## Changelog
 
-###1.0.2
+###1.1.0
 * Added support for 0.9.3 rc2
 * Changed the way we handle the datatypes of values
 * Changed list retention policies to reflect the changes in 0.9.3
