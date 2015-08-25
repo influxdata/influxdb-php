@@ -81,9 +81,12 @@ It's also possible to use the QueryBuilder object. This is a class that simplifi
     $query = $database->getQueryBuilder()
          ->select('cpucount')
          ->from('test_metric')
+         ->where(["region = 'us-west'"])
          ->getQuery();
          
 ```
+
+Make sure that you enter single quotes when doing a where query on strings; otherwise InfluxDB will return an empty result.
 
 ### Writing data
 

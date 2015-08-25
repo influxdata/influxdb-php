@@ -61,6 +61,16 @@ class Point
             $this->fields['value'] = $value;
         }
 
+        foreach ($this->fields as &$field) {
+            if (is_integer($field)) {
+                $field = sprintf('%di', $field);
+            } elseif (is_string($field)) {
+                $field = sprintf("\"%s\"", $field);
+            } elseif (is_bool($field)) {
+                $field = ($field ? "true" : "false");
+            }
+        }
+
         if ($timestamp && !$this->isValidTimeStamp($timestamp)) {
             throw new DatabaseException(sprintf('%s is not a valid timestamp', $timestamp));
         }

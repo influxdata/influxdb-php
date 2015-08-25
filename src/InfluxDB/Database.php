@@ -174,7 +174,7 @@ class Database
      */
     public function listRetentionPolicies()
     {
-        return $this->query(sprintf('SHOW RETENTION POLICIES %s', $this->name))->getPoints();
+        return $this->query(sprintf('SHOW RETENTION POLICIES ON %s', $this->name))->getPoints();
     }
 
     /**
