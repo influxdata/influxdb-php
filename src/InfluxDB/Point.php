@@ -57,7 +57,7 @@ class Point
         $this->tags = $tags;
         $this->fields = $additionalFields;
 
-        if ($value) {
+        if ($value !== null) {
             $this->fields['value'] = $value;
         }
 
