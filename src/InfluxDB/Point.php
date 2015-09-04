@@ -90,16 +90,52 @@ class Point
         $string = $this->measurement;
 
         if (count($this->tags) > 0) {
-            $string .=  ',' . $this->arrayToString($this->tags);
+            $string .=  ',' . $this->arrayToString($this->escapeCharacters($this->tags));
         }
 
-        $string .= ' ' . $this->arrayToString($this->fields);
+        $string .= ' ' . $this->arrayToString($this->escapeCharacters($this->fields));
 
         if ($this->timestamp) {
             $string .= ' '.$this->timestamp;
         }
 
         return $string;
+    }
+
+    /**
+     * Escapes invalid characters in both the array key and array value
+     *
+     * @param array $arr
+     * @return array
+     */
+    private function escapeCharacters(array $arr)
+    {
+        $returnArr = [];
+
+        foreach ($arr as $key => $value) {
+            $returnArr[$this->addSlashes($key)] = $this->addSlashes($value);
+        }
+
+        return $returnArr;
+    }
+
+    /**
+     * Returns strings with space, comma, or equals sign characters backslashed per Influx write protocol syntax
+     *
+     * @param string $value
+     * @return string
+     */
+    private function addSlashes($value)
+    {
+        return str_replace([
+            ' ',
+            ',',
+            '='
+        ],[
+            '\ ',
+            '\,',
+            '\='
+        ], $value);
     }
 
     /**
