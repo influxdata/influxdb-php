@@ -37,24 +37,44 @@ class DatabaseTest extends AbstractTest
 
     }
 
+    public function testGetters()
+    {
+        $this->assertInstanceOf('InfluxDB\Client', $this->database->getClient());
+        $this->assertInstanceOf('InfluxDB\Query\Builder', $this->database->getQueryBuilder());
+    }
+
+
     /**
      *
      */
-    public function testQuery()
+    public function testQueries()
     {
         $testResultSet = new ResultSet($this->resultData);
         $this->assertEquals($this->database->query('SELECT * FROM test_metric'), $testResultSet);
+
+        $this->database->drop();
+        $this->assertEquals('DROP DATABASE influx_test_db', Client::$lastQuery);
+
     }
 
-    public function testCreateRetentionPolicy()
+
+    public function testRetentionPolicyQueries()
     {
-        $retentionPolicy = new Database\RetentionPolicy('test', '1d', 1, true);
+        $retentionPolicy = $this->getTestRetentionPolicy();
 
-        $mockClient = $this->getClientMock(true);
+        $this->assertEquals(
+            $this->getTestDatabase()->createRetentionPolicy($retentionPolicy),
+            new ResultSet($this->getEmptyResult())
+        );
 
-        $database = new Database('test', $mockClient);
+        $this->database->listRetentionPolicies();
+        $this->assertEquals('SHOW RETENTION POLICIES ON influx_test_db', Client::$lastQuery);
 
-        $this->assertEquals($database->createRetentionPolicy($retentionPolicy), new ResultSet($this->getEmptyResult()));
+        $this->database->alterRetentionPolicy($this->getTestRetentionPolicy());
+        $this->assertEquals(
+            'ALTER RETENTION POLICY test ON influx_test_db DURATION 1d REPLICATION 1 DEFAULT',
+            Client::$lastQuery
+        );
     }
 
     /**
@@ -64,6 +84,38 @@ class DatabaseTest extends AbstractTest
     {
         new Database(null, $this->mockClient);
     }
+
+    public function testCreate()
+    {
+        // test create with retention policy
+        $this->database->create($this->getTestRetentionPolicy('influx_test_db'), true);
+        $this->assertEquals(
+            'CREATE RETENTION POLICY influx_test_db ON influx_test_db DURATION 1d REPLICATION 1 DEFAULT',
+            Client::$lastQuery
+        );
+
+        // test creating a database without create if not exists
+        $this->database->create(null, true);
+        $this->assertEquals('CREATE DATABASE IF NOT EXISTS influx_test_db', Client::$lastQuery);
+
+        // test creating a database without create if not exists
+        $this->database->create(null, false);
+        $this->assertEquals('CREATE DATABASE influx_test_db', Client::$lastQuery);
+
+
+        $this->mockClient->expects($this->any())
+            ->method('query')
+            ->will($this->returnCallback(function () {
+                throw new \Exception('test exception');
+            }));
+
+
+        // test an exception being handled correctly
+        $this->setExpectedException('\InfluxDB\Database\Exception');
+        $this->database->create($this->getTestRetentionPolicy('influx_test_db'), false);
+
+    }
+
 
     public function testExists()
     {
@@ -96,5 +148,25 @@ class DatabaseTest extends AbstractTest
         );
 
         $this->assertEquals(true, $this->database->writePoints(array($point1, $point2)));
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Database
+     */
+    protected function getTestDatabase($name = 'test')
+    {
+        return new Database($name, $this->getClientMock(true));
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Database\RetentionPolicy
+     */
+    protected function getTestRetentionPolicy($name = 'test')
+    {
+        return new Database\RetentionPolicy($name, '1d', 1, true);
     }
 }

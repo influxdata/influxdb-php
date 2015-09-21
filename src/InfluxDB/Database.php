@@ -77,14 +77,21 @@ class Database
      * Create this database
      *
      * @param  RetentionPolicy $retentionPolicy
+     * @param bool             $createIfNotExists Only create the database if it does not yet exist
+     *
      * @return ResultSet
      * @throws DatabaseException
-     * @throws Exception
      */
-    public function create(RetentionPolicy $retentionPolicy = null)
+    public function create(RetentionPolicy $retentionPolicy = null, $createIfNotExists = true)
     {
         try {
-            $this->query(sprintf('CREATE DATABASE %s', $this->name));
+            $query = sprintf(
+                'CREATE DATABASE %s%s',
+                ($createIfNotExists ? 'IF NOT EXISTS ' : ''),
+                $this->name
+            );
+
+            $this->query($query);
 
             if ($retentionPolicy) {
                 $this->createRetentionPolicy($retentionPolicy);

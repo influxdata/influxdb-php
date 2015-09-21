@@ -80,6 +80,16 @@ $query = $database->getQueryBuilder()
 
 Make sure that you enter single quotes when doing a where query on strings; otherwise InfluxDB will return an empty result.
 
+You can get the last executed query from the client:
+
+```php
+// use the getLastQuery() method
+$lastQuery = $client->getLastQuery();
+
+// or access the static variable directly:
+$lastQuery = Client::lastQuery;
+```
+
 ### Writing data
 
 Writing data is done by providing an array of points to the writePoints method on a database:
@@ -314,6 +324,11 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 
 ## Changelog
+
+###1.1.1
+* Added support for 0.9.4
+* Added if not exists support to database->create()
+* Added getLastQuery method
 
 ###1.1.0
 * Added support for 0.9.3 rc2

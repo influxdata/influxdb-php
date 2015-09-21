@@ -52,7 +52,11 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 
         $this->mockClient->expects($this->any())
             ->method('query')
-            ->will($this->returnValue(new ResultSet($this->resultData)));
+            ->will($this->returnCallback(function ($db, $query) {
+                Client::$lastQuery = $query;
+
+                return new ResultSet($this->resultData);
+            }));
 
         $httpMockClient = new Guzzle($this->buildHttpMockClient(''));
 
@@ -114,7 +118,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         if ($emptyResult) {
-            $mockClient->expects($this->once())
+            $mockClient->expects($this->any())
                 ->method('query')
                 ->will($this->returnValue(new ResultSet($this->getEmptyResult())));
         }

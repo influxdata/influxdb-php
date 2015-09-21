@@ -88,6 +88,14 @@ class Client
      */
     protected $driver;
 
+
+    /**
+     * Stores the last query that ran
+     *
+     * @var null
+     */
+    public static $lastQuery = null;
+
     /**
      * @param string $host
      * @param int    $port
@@ -183,6 +191,9 @@ class Client
         $driver->setParameters($parameters);
 
         try {
+            // store the last query sent
+            static::$lastQuery = $query;
+
             // perform the query and return the resultset
             return $driver->query();
 
@@ -304,6 +315,16 @@ class Client
     public function getHost()
     {
         return $this->host;
+    }
+
+    /**
+     * Returns the last executed query
+     *
+     * @return null|string
+     */
+    public function getLastQuery()
+    {
+        return static::$lastQuery;
     }
 
     /**
