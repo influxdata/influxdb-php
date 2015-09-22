@@ -141,8 +141,8 @@ class Database
             ];
 
             // add authentication to the driver if needed
-            if (!empty($this->username) && !empty($this->password)) {
-                $parameters += ['auth' => [$this->username, $this->password]];
+            if ($this->client->getUsername() && $this->client->getPassword()) {
+                $parameters += ['auth' => [$this->client->getUsername(), $this->client->getUsername()]];
             }
 
             $driver->setParameters($parameters);
