@@ -325,6 +325,9 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
+###1.1.2
+* Fixed issue with authentication when writing data
+
 ###1.1.1
 * Added support for 0.9.4
 * Added if not exists support to database->create()
