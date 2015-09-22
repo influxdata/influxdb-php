@@ -132,25 +132,13 @@ class Database
         );
 
         try {
-            $driver = $this->client->getDriver();
-
             $parameters = [
                 'url' => sprintf('write?db=%s&precision=%s', $this->name, $precision),
                 'database' => $this->name,
                 'method' => 'post'
             ];
 
-            // add authentication to the driver if needed
-            if (!empty($this->username) && !empty($this->password)) {
-                $parameters += ['auth' => [$this->username, $this->password]];
-            }
-
-            $driver->setParameters($parameters);
-
-            // send the points to influxDB
-            $driver->write(implode(PHP_EOL, $payload));
-
-            return $driver->isSuccess();
+            return $this->client->write($parameters, $payload);
 
         } catch (\Exception $e) {
             throw new Exception($e->getMessage(), $e->getCode());
