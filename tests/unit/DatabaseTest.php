@@ -148,6 +148,15 @@ class DatabaseTest extends AbstractTest
         );
 
         $this->assertEquals(true, $this->database->writePoints(array($point1, $point2)));
+
+        $this->mockClient->expects($this->once())
+            ->method('write')
+            ->will($this->throwException(new \Exception('Test exception')));
+
+        $this->setExpectedException('InfluxDB\Exception');
+
+        $this->database->writePoints(array($point1, $point2));
+
     }
 
     /**

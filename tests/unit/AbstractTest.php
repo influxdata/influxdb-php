@@ -96,7 +96,11 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     public function buildHttpMockClient($body)
     {
         // Create a mock and queue two responses.
-        $mock = new MockHandler([new Response(200, array(), $body)]);
+        $mock = new MockHandler([
+            new Response(200, array(), $body),
+            new Response(200, array(), $body),
+            new Response(200, array(), 'fault{')
+        ]);
 
         $handler = HandlerStack::create($mock);
         return new GuzzleClient(['handler' => $handler]);

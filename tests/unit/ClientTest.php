@@ -4,6 +4,7 @@ namespace InfluxDB\Test;
 
 use InfluxDB\Client;
 use InfluxDB\Driver\Guzzle;
+use InfluxDB\Point;
 
 class ClientTest extends AbstractTest
 {
@@ -65,6 +66,18 @@ class ClientTest extends AbstractTest
         $result = $client->query(null, $query);
 
         $this->assertInstanceOf('\InfluxDB\ResultSet', $result);
+
+        $this->assertEquals(
+            true,
+            $client->write(
+                [
+                    'url' => 'http://localhost',
+                    'database' => 'influx_test_db',
+                    'method' => 'post'
+                ],
+                [new Point('test', 1.0)]
+            )
+        );
     }
 
     public function testGetLastQuery()

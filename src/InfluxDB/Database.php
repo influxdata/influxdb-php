@@ -205,10 +205,6 @@ class Database
      */
     protected function getRetentionPolicyQuery($method, RetentionPolicy $retentionPolicy)
     {
-        if (!in_array($method, ['CREATE', 'ALTER'])) {
-            throw new \InvalidArgumentException(sprintf('%s is not a valid method'));
-        }
-
         $query = sprintf(
             '%s RETENTION POLICY %s ON %s DURATION %s REPLICATION %s',
             $method,

@@ -87,16 +87,9 @@ class Guzzle implements DriverInterface, QueryDriverInterface
      */
     public function query()
     {
-
         $response = $this->httpClient->get($this->parameters['url'], $this->getRequestParameters());
 
         $raw = (string) $response->getBody();
-
-        $responseJson = json_encode($raw);
-
-        if (isset($responseJson->error)) {
-            throw new Exception($responseJson->error);
-        }
 
         return new ResultSet($raw);
 
