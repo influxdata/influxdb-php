@@ -203,6 +203,33 @@ class Client
     }
 
     /**
+     * Write data
+     *
+     * @param array           $parameters
+     * @param string          $payload
+     *
+     * @return bool
+     */
+    public function write(array $parameters, $payload)
+    {
+        // retrive the driver
+        $driver = $this->getDriver();
+
+        // add authentication to the driver if needed
+        if (!empty($this->username) && !empty($this->password)) {
+            $parameters += ['auth' => [$this->username, $this->password]];
+        }
+
+        // set the given parameters
+        $driver->setParameters($parameters);
+
+        // send the points to influxDB
+        $driver->write(implode(PHP_EOL, $payload));
+
+        return $driver->isSuccess();
+    }
+
+    /**
      * List all the databases
      */
     public function listDatabases()

@@ -10,7 +10,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use InfluxDB\Client;
 use InfluxDB\Database;
-use InfluxDB\Driver\Guzzle;
+use InfluxDB\Driver\Guzzle as GuzzleDriver;
 use InfluxDB\ResultSet;
 use PHPUnit_Framework_MockObject_MockObject;
 use GuzzleHttp\Client as GuzzleClient;
@@ -58,7 +58,11 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
                 return new ResultSet($this->resultData);
             }));
 
-        $httpMockClient = new Guzzle($this->buildHttpMockClient(''));
+        $this->mockClient->expects($this->any())
+            ->method('write')
+            ->will($this->returnValue(true));
+
+        $httpMockClient = new GuzzleDriver($this->buildHttpMockClient(''));
 
         // make sure the client has a valid driver
         $this->mockClient->expects($this->any())
