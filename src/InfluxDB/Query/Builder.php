@@ -61,6 +61,11 @@ class Builder
     protected $limitClause = '';
 
     /**
+     * @var array
+     */
+    protected $groupBy;
+
+    /**
      * @param Database $db
      */
     public function __construct(Database $db)
@@ -178,6 +183,12 @@ class Builder
         return $this;
     }
 
+    public function groupBy($field = 'type') {
+        $this->groupBy[] = $field;
+
+        return $this;
+    }
+
     /**
      * Set's the time range to select data from
      *
@@ -260,6 +271,10 @@ class Builder
             $clause = $this->where[$i];
             $query .= ' ' . $selection . ' ' . $clause;
 
+        }
+
+        if (!empty($this->groupBy)) {
+            $query .= ' GROUP BY ' . implode(',', $this->groupBy);
         }
 
         if ($this->limitClause) {
