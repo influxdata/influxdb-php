@@ -224,7 +224,7 @@ class Client
         $driver->setParameters($parameters);
 
         // send the points to influxDB
-        $driver->write(implode(PHP_EOL, $payload));
+        $driver->write(implode("\n", $payload));
 
         return $driver->isSuccess();
     }
