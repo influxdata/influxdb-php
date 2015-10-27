@@ -159,14 +159,18 @@ class Point
      */
     private function isValidTimeStamp($timestamp)
     {
-        if ((int) $timestamp === $timestamp) {
-            return true;
+        if(!is_numeric($timestamp)) {
+            return false;
         }
 
-        if ($timestamp <= PHP_INT_MAX && $timestamp >= ~PHP_INT_MAX) {
-            return true;
+        if (intval($timestamp) != $timestamp) {
+            return false;
         }
 
-        return false;
+        if (!($timestamp <= PHP_INT_MAX && $timestamp >= ~PHP_INT_MAX)) {
+            return false;
+        }
+
+        return true;
     }
 }
