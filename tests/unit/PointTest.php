@@ -73,7 +73,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
             array('15.258'),
             array('15,258'),
             array(15.258),
-            array(TRUE)
+            array(true)
         );
     }
 

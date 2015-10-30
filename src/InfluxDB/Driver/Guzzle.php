@@ -109,7 +109,7 @@ class Guzzle implements DriverInterface, QueryDriverInterface
             throw new \Exception('HTTP Code ' . $statuscode . ' ' . $this->response->getBody());
         }
 
-        return TRUE;
+        return true;
     }
 
     /**
