@@ -102,7 +102,14 @@ class Guzzle implements DriverInterface, QueryDriverInterface
      */
     public function isSuccess()
     {
-        return in_array($this->response->getStatusCode(), ['200', '204']);
+        $statuscode = $this->response->getStatusCode();
+
+        if(!in_array($statuscode, ['200', '204']))
+        {
+            throw new \Exception('HTTP Code ' . $statuscode . ' ' . $this->response->getBody());
+        }
+
+        return true;
     }
 
     /**
