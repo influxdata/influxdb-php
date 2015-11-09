@@ -10,7 +10,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     /** @var Client $client */
     protected $client = null;
-    
+
     public function testBaseURl()
     {
         $client = new Client('localhost', 8086);
@@ -32,6 +32,12 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dbName, $db->getName());
     }
 
+    public function testAuth()
+    {
+        $client = new Client('localhost', 8086, 'test', 'test');
+
+        $this->assertEquals(array('test', 'test'), $client->getHttpClient()->getDefaultOption('auth'));
+    }
 
     /**
      */

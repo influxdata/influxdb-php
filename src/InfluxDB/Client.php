@@ -115,6 +115,9 @@ class Client
         $this->baseURI = sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port);
         $this->httpClient = new \Guzzle\Http\Client($this->getBaseURI());
 
+        if ($this->username && $this->password) {
+            $this->httpClient->setDefaultOption('auth', array($this->username, $this->password));
+        }
     }
 
     /**
@@ -309,5 +312,13 @@ class Client
         }
 
         return $names;
+    }
+
+    /**
+     * @return \Guzzle\Http\Client
+     */
+    public function getHttpClient()
+    {
+        return $this->httpClient;
     }
 }
