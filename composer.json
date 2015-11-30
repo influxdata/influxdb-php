@@ -24,7 +24,7 @@
     "require": {
         "php": ">=5.5",
         "guzzlehttp/guzzle": "6.*",
-        "symfony/event-dispatcher": "2.*"
+        "symfony/event-dispatcher": "2.*|3.*"
     },
     "require-dev": {
         "codeclimate/php-test-reporter": "0.*",
