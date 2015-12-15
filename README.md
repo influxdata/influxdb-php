@@ -325,6 +325,9 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
+###1.1.3
+* Added support for symfony3
+
 ###1.1.2
 * Fixed issue with authentication when writing data
 
