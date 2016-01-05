@@ -44,7 +44,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->resultData = file_get_contents(dirname(__FILE__) . '/result.example.json');
+        $this->resultData = file_get_contents(dirname(__FILE__) . '/json/result.example.json');
 
         $this->mockClient->expects($this->any())
             ->method('getBaseURI')
@@ -99,7 +99,9 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         $mock = new MockHandler([
             new Response(200, array(), $body),
             new Response(200, array(), $body),
-            new Response(200, array(), 'fault{')
+            new Response(400, array(), 'fault{'),
+            new Response(400, array(), $body),
+            new Response(400, array(), $body),
         ]);
 
         $handler = HandlerStack::create($mock);

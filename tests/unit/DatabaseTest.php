@@ -27,13 +27,13 @@ class DatabaseTest extends AbstractTest
     {
         parent::setUp();
 
-        $this->resultData = file_get_contents(dirname(__FILE__) . '/result.example.json');
+        $this->resultData = file_get_contents(dirname(__FILE__) . '/json/result.example.json');
 
         $this->mockClient->expects($this->any())
             ->method('listDatabases')
             ->will($this->returnValue(array('test123', 'test')));
 
-        $this->dataToInsert = file_get_contents(dirname(__FILE__) . '/input.example.json');
+        $this->dataToInsert = file_get_contents(dirname(__FILE__) . '/json/input.example.json');
 
     }
 

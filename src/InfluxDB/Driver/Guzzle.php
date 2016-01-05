@@ -69,6 +69,14 @@ class Guzzle implements DriverInterface, QueryDriverInterface
     }
 
     /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
      * Send the data
      *
      * @param $data
@@ -106,7 +114,7 @@ class Guzzle implements DriverInterface, QueryDriverInterface
 
         if(!in_array($statuscode, ['200', '204']))
         {
-            throw new \Exception('HTTP Code ' . $statuscode . ' ' . $this->response->getBody());
+            throw new Exception('HTTP Code ' . $statuscode . ' ' . $this->response->getBody());
         }
 
         return true;

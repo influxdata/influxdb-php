@@ -325,6 +325,11 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
+###1.2.2
+* Fixed issue with listUsers() method
+* Added more unit tests
+* Added getColumns method to \InfluxDB\ResultSet
+
 ###1.2.0
 * Added support for 32 bit systems
 * Added setters/getters for Point fields

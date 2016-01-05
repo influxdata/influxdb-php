@@ -111,7 +111,7 @@ class Client
         $username = '',
         $password = '',
         $ssl = false,
-        $verifySSL = true,
+        $verifySSL = false,
         $timeout = 0
     ) {
         $this->host = (string) $host;
@@ -247,9 +247,9 @@ class Client
      */
     public function listUsers()
     {
-        $result = $this->query(null, 'SHOW USERS')->getPoints();
+        $result = $this->query(null, 'SHOW USERS')->getColumns();
 
-        return $this->pointsToArray($result);
+        return (array) $result;
     }
 
     /**
