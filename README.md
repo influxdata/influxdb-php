@@ -8,7 +8,7 @@
 
 A easy to use library for using InfluxDB with PHP.
 
-The influxdb-php library was created to have php port of the python influxdb client. 
+The influxdb-php library was created to have php port of the python influxdb client.
 This way there will be a common abstraction library between different programming languages.
 
 ### Installation
@@ -69,7 +69,7 @@ $result = $database->getQueryBuilder()
 	->limit(2)
 	->getResultSet()
 	->getPoints();
-	
+
 // get the query from the QueryBuilder
 $query = $database->getQueryBuilder()
 	->select('cpucount')
@@ -153,7 +153,7 @@ First, set your InfluxDB host to support incoming UDP sockets:
 [udp]
   enabled = true
   bind-address = ":4444"
-  database = "test_db"  
+  database = "test_db"
 ```
 
 Then, configure the UDP driver in the client:
@@ -161,7 +161,7 @@ Then, configure the UDP driver in the client:
 ```php
 // set the UDP driver in the client
 $client->setDriver(new \InfluxDB\Driver\UDP($client->getHost(), 4444));
-    
+
 $points = [
 	new Point(
 		'test_metric',
@@ -171,7 +171,7 @@ $points = [
 		exec('date +%s%N') // this will produce a nanosecond timestamp on Linux ONLY
 	)
 ];
-    
+
 // now just write your points like you normally would
 $result = $database->writePoints($points);
 ```
@@ -179,11 +179,11 @@ $result = $database->writePoints($points);
 Or simply use a DSN (Data Source Name) to send metrics using UDP:
 
 ```php
-// get a database object using a DSN (Data Source Name) 
+// get a database object using a DSN (Data Source Name)
 $database = \InfluxDB\Client::fromDSN('udp+influxdb://username:pass@localhost:4444/test123');
-    
+
 // write your points
-$result = $database->writePoints($points);    
+$result = $database->writePoints($points);
 ```
 
 *Note:* It is import to note that precision will be *ignored* when you use UDP. You should always use nanosecond
@@ -200,7 +200,7 @@ $newPoints = $database->writePoints($points);
 
 // Points will require second precision
 $newPoints = $database->writePoints($points, Database::PRECISION_SECONDS);
-    
+
 // Points will require microsecond precision
 $newPoints = $database->writePoints($points, Database::PRECISION_MICROSECONDS);
 ```
@@ -215,7 +215,7 @@ $timestamp = sprintf('%d%06d', $sec, $usec*1000000);
 ### Creating databases
 
 When creating a database a default retention policy is added. This retention policy does not have a duration
-so the data will be flushed with the memory. 
+so the data will be flushed with the memory.
 
 This library makes it easy to provide a retention policy when creating a database:
 
@@ -227,14 +227,14 @@ $client = new \InfluxDB\Client($host, $port, '', '');
 $database = $client->selectDB('influx_test_db');
 
 // create the database with a retention policy
-$result = $database->create(new RetentionPolicy('test', '5d', 1, true));   
-     
+$result = $database->create(new RetentionPolicy('test', '5d', 1, true));
+
 // check if a database exists then create it if it doesn't
 $database = $client->selectDB('test_db');
-    
+
 if (!$database->exists()) {
 	$database->create(new RetentionPolicy('test', '1d', 2, true));
-}  
+}
 ```
 
 You can also alter retention policies:
@@ -294,7 +294,7 @@ $users = $results->getPoints();
 
 #### Granting and revoking privileges
 
-Granting permissions can be done on both the database level and cluster-wide. 
+Granting permissions can be done on both the database level and cluster-wide.
 To grant a user specific privileges on a database, provide a database object or a database name.
 
 ```php
@@ -325,6 +325,10 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
+###1.2.0
+* Added support for 32 bit systems
+* Added setters/getters for Point fields
+
 ###1.1.3
 * Added support for symfony3
 
@@ -341,7 +345,7 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 * Changed the way we handle the datatypes of values
 * Changed list retention policies to reflect the changes in 0.9.3
 
-####1.0.1 
+####1.0.1
 * Added support for authentication in the guzzle driver
 * Added admin functionality
 

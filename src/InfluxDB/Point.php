@@ -14,22 +14,22 @@ class Point
     /**
      * @var string
      */
-    private $measurement;
+    protected $measurement;
 
     /**
      * @var array
      */
-    private $tags = [];
+    protected $tags = [];
 
     /**
      * @var array
      */
-    private $fields = [];
+    protected $fields = [];
 
     /**
      * @var string
      */
-    private $timestamp;
+    protected $timestamp;
 
     /**
      * The timestamp is optional. If you do not specify a timestamp the server’s
@@ -55,21 +55,13 @@ class Point
 
         $this->measurement = (string) $measurement;
         $this->tags = $tags;
-        $this->fields = $additionalFields;
+        $fields = $additionalFields;
 
         if ($value !== null) {
-            $this->fields['value'] = $value;
+            $fields['value'] = $value;
         }
 
-        foreach ($this->fields as &$field) {
-            if (is_integer($field)) {
-                $field = sprintf('%di', $field);
-            } elseif (is_string($field)) {
-                $field = sprintf("\"%s\"", $field);
-            } elseif (is_bool($field)) {
-                $field = ($field ? "true" : "false");
-            }
-        }
+        $this->setFields($fields);
 
         if ($timestamp && !$this->isValidTimeStamp($timestamp)) {
             throw new DatabaseException(sprintf('%s is not a valid timestamp', $timestamp));
@@ -100,6 +92,80 @@ class Point
         }
 
         return $string;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMeasurement()
+    {
+        return $this->measurement;
+    }
+
+    /**
+     * @param string $measurement
+     */
+    public function setMeasurement($measurement)
+    {
+        $this->measurement = $measurement;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param array $tags
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @param array $fields
+     */
+    public function setFields($fields)
+    {
+        foreach ($fields as &$field) {
+            if (is_integer($field)) {
+                $field = sprintf('%di', $field);
+            } elseif (is_string($field)) {
+                $field = sprintf("\"%s\"", $field);
+            } elseif (is_bool($field)) {
+                $field = ($field ? "true" : "false");
+            }
+        }
+
+        $this->fields = $fields;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimestamp()
+    {
+        return $this->timestamp;
+    }
+
+    /**
+     * @param string $timestamp
+     */
+    public function setTimestamp($timestamp)
+    {
+        $this->timestamp = $timestamp;
     }
 
     /**
@@ -159,7 +225,13 @@ class Point
      */
     private function isValidTimeStamp($timestamp)
     {
-        if(!is_numeric($timestamp)) {
+
+        // if the code is run on a 32bit system, loosely check if the timestamp is a valid numeric
+        if (PHP_INT_SIZE == 4 && is_numeric($timestamp) && intval($timestamp) == $timestamp) {
+            return true;
+        }
+
+        if (!is_numeric($timestamp)) {
             return false;
         }
 
@@ -172,5 +244,7 @@ class Point
         }
 
         return true;
+
+
     }
 }
