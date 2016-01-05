@@ -227,7 +227,7 @@ class Point
     {
 
         // if the code is run on a 32bit system, loosely check if the timestamp is a valid numeric
-        if (PHP_INT_SIZE == 4 && is_numeric($timestamp) && intval($timestamp) == $timestamp) {
+        if (PHP_INT_SIZE == 4 && is_numeric($timestamp)) {
             return true;
         }
 
