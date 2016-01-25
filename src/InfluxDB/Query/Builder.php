@@ -66,6 +66,11 @@ class Builder
     protected $groupBy;
 
     /**
+     * @var array
+     */
+    protected $orderBy;
+
+    /**
      * @param Database $db
      */
     public function __construct(Database $db)
@@ -189,6 +194,12 @@ class Builder
         return $this;
     }
 
+    public function orderBy($field = 'type', $order = 'ASC') {
+        $this->orderBy[] = "$field $order";
+
+        return $this;
+    }
+
     /**
      * Set's the time range to select data from
      *
@@ -275,6 +286,10 @@ class Builder
 
         if (!empty($this->groupBy)) {
             $query .= ' GROUP BY ' . implode(',', $this->groupBy);
+        }
+
+        if (!empty($this->orderBy)) {
+            $query .= ' ORDER BY ' . implode(',', $this->orderBy);
         }
 
         if ($this->limitClause) {
