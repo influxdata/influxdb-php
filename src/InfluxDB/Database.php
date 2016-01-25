@@ -86,7 +86,7 @@ class Database
     {
         try {
             $query = sprintf(
-                'CREATE DATABASE %s%s',
+                'CREATE DATABASE %s"%s"',
                 ($createIfNotExists ? 'IF NOT EXISTS ' : ''),
                 $this->name
             );
@@ -169,7 +169,7 @@ class Database
      */
     public function listRetentionPolicies()
     {
-        return $this->query(sprintf('SHOW RETENTION POLICIES ON %s', $this->name))->getPoints();
+        return $this->query(sprintf('SHOW RETENTION POLICIES ON "%s"', $this->name))->getPoints();
     }
 
     /**
@@ -177,7 +177,7 @@ class Database
      */
     public function drop()
     {
-        $this->query(sprintf('DROP DATABASE %s', $this->name));
+        $this->query(sprintf('DROP DATABASE "%s"', $this->name));
     }
 
     /**
@@ -206,7 +206,7 @@ class Database
     protected function getRetentionPolicyQuery($method, RetentionPolicy $retentionPolicy)
     {
         $query = sprintf(
-            '%s RETENTION POLICY %s ON %s DURATION %s REPLICATION %s',
+            '%s RETENTION POLICY %s ON "%s" DURATION %s REPLICATION %s',
             $method,
             $retentionPolicy->name,
             $this->name,
