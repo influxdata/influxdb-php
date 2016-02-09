@@ -53,7 +53,7 @@ class DatabaseTest extends AbstractTest
         $this->assertEquals($this->database->query('SELECT * FROM test_metric'), $testResultSet);
 
         $this->database->drop();
-        $this->assertEquals('DROP DATABASE influx_test_db', Client::$lastQuery);
+        $this->assertEquals('DROP DATABASE "influx_test_db"', Client::$lastQuery);
 
     }
 
@@ -68,11 +68,11 @@ class DatabaseTest extends AbstractTest
         );
 
         $this->database->listRetentionPolicies();
-        $this->assertEquals('SHOW RETENTION POLICIES ON influx_test_db', Client::$lastQuery);
+        $this->assertEquals('SHOW RETENTION POLICIES ON "influx_test_db"', Client::$lastQuery);
 
         $this->database->alterRetentionPolicy($this->getTestRetentionPolicy());
         $this->assertEquals(
-            'ALTER RETENTION POLICY test ON influx_test_db DURATION 1d REPLICATION 1 DEFAULT',
+            'ALTER RETENTION POLICY "test" ON "influx_test_db" DURATION 1d REPLICATION 1 DEFAULT',
             Client::$lastQuery
         );
     }
@@ -90,17 +90,17 @@ class DatabaseTest extends AbstractTest
         // test create with retention policy
         $this->database->create($this->getTestRetentionPolicy('influx_test_db'), true);
         $this->assertEquals(
-            'CREATE RETENTION POLICY influx_test_db ON influx_test_db DURATION 1d REPLICATION 1 DEFAULT',
+            'CREATE RETENTION POLICY "influx_test_db" ON "influx_test_db" DURATION 1d REPLICATION 1 DEFAULT',
             Client::$lastQuery
         );
 
         // test creating a database without create if not exists
         $this->database->create(null, true);
-        $this->assertEquals('CREATE DATABASE IF NOT EXISTS influx_test_db', Client::$lastQuery);
+        $this->assertEquals('CREATE DATABASE IF NOT EXISTS "influx_test_db"', Client::$lastQuery);
 
         // test creating a database without create if not exists
         $this->database->create(null, false);
-        $this->assertEquals('CREATE DATABASE influx_test_db', Client::$lastQuery);
+        $this->assertEquals('CREATE DATABASE "influx_test_db"', Client::$lastQuery);
 
 
         $this->mockClient->expects($this->any())

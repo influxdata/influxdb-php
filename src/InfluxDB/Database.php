@@ -206,7 +206,7 @@ class Database
     protected function getRetentionPolicyQuery($method, RetentionPolicy $retentionPolicy)
     {
         $query = sprintf(
-            '%s RETENTION POLICY %s ON "%s" DURATION %s REPLICATION %s',
+            '%s RETENTION POLICY "%s" ON "%s" DURATION %s REPLICATION %s',
             $method,
             $retentionPolicy->name,
             $this->name,
