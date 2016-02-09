@@ -160,6 +160,31 @@ class DatabaseTest extends AbstractTest
     }
 
     /**
+     * @see https://github.com/influxdata/influxdb-php/pull/36
+     */
+    public function testReservedNames()
+    {
+        $database = new Database('stats', $this->mockClient);
+
+        // test handling of reserved keywords in database name
+        $database->create();
+        $this->assertEquals('CREATE DATABASE IF NOT EXISTS "stats"', Client::$lastQuery);
+
+        $database->listRetentionPolicies();
+        $this->assertEquals('SHOW RETENTION POLICIES ON "stats"', Client::$lastQuery);
+
+        // test handling of reserved keywords in retention policy names
+        $database->create($this->getTestRetentionPolicy('default'));
+        $this->assertEquals(
+            'CREATE RETENTION POLICY "default" ON "stats" DURATION 1d REPLICATION 1 DEFAULT',
+            Client::$lastQuery
+        );
+
+        // test handling of reserved keywords in measurement names
+        $this->assertEquals($database->getQueryBuilder()->from('server')->getQuery(), 'SELECT * FROM "server"');
+    }
+
+    /**
      * @param string $name
      *
      * @return Database
