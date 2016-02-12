@@ -53,7 +53,7 @@ class DatabaseTest extends AbstractTest
         $this->assertEquals($this->database->query('SELECT * FROM test_metric'), $testResultSet);
 
         $this->database->drop();
-        $this->assertEquals('DROP DATABASE influx_test_db', Client::$lastQuery);
+        $this->assertEquals('DROP DATABASE "influx_test_db"', Client::$lastQuery);
 
     }
 
@@ -68,11 +68,11 @@ class DatabaseTest extends AbstractTest
         );
 
         $this->database->listRetentionPolicies();
-        $this->assertEquals('SHOW RETENTION POLICIES ON influx_test_db', Client::$lastQuery);
+        $this->assertEquals('SHOW RETENTION POLICIES ON "influx_test_db"', Client::$lastQuery);
 
         $this->database->alterRetentionPolicy($this->getTestRetentionPolicy());
         $this->assertEquals(
-            'ALTER RETENTION POLICY test ON influx_test_db DURATION 1d REPLICATION 1 DEFAULT',
+            'ALTER RETENTION POLICY "test" ON "influx_test_db" DURATION 1d REPLICATION 1 DEFAULT',
             Client::$lastQuery
         );
     }
@@ -90,17 +90,17 @@ class DatabaseTest extends AbstractTest
         // test create with retention policy
         $this->database->create($this->getTestRetentionPolicy('influx_test_db'), true);
         $this->assertEquals(
-            'CREATE RETENTION POLICY influx_test_db ON influx_test_db DURATION 1d REPLICATION 1 DEFAULT',
+            'CREATE RETENTION POLICY "influx_test_db" ON "influx_test_db" DURATION 1d REPLICATION 1 DEFAULT',
             Client::$lastQuery
         );
 
         // test creating a database without create if not exists
         $this->database->create(null, true);
-        $this->assertEquals('CREATE DATABASE IF NOT EXISTS influx_test_db', Client::$lastQuery);
+        $this->assertEquals('CREATE DATABASE IF NOT EXISTS "influx_test_db"', Client::$lastQuery);
 
         // test creating a database without create if not exists
         $this->database->create(null, false);
-        $this->assertEquals('CREATE DATABASE influx_test_db', Client::$lastQuery);
+        $this->assertEquals('CREATE DATABASE "influx_test_db"', Client::$lastQuery);
 
 
         $this->mockClient->expects($this->any())
@@ -157,6 +157,31 @@ class DatabaseTest extends AbstractTest
 
         $this->database->writePoints(array($point1, $point2));
 
+    }
+
+    /**
+     * @see https://github.com/influxdata/influxdb-php/pull/36
+     */
+    public function testReservedNames()
+    {
+        $database = new Database('stats', $this->mockClient);
+
+        // test handling of reserved keywords in database name
+        $database->create();
+        $this->assertEquals('CREATE DATABASE IF NOT EXISTS "stats"', Client::$lastQuery);
+
+        $database->listRetentionPolicies();
+        $this->assertEquals('SHOW RETENTION POLICIES ON "stats"', Client::$lastQuery);
+
+        // test handling of reserved keywords in retention policy names
+        $database->create($this->getTestRetentionPolicy('default'));
+        $this->assertEquals(
+            'CREATE RETENTION POLICY "default" ON "stats" DURATION 1d REPLICATION 1 DEFAULT',
+            Client::$lastQuery
+        );
+
+        // test handling of reserved keywords in measurement names
+        $this->assertEquals($database->getQueryBuilder()->from('server')->getQuery(), 'SELECT * FROM "server"');
     }
 
     /**

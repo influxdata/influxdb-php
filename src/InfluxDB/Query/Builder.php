@@ -255,7 +255,7 @@ class Builder
      */
     protected function parseQuery()
     {
-        $query = sprintf("SELECT %s FROM %s", $this->selection, $this->metric);
+        $query = sprintf('SELECT %s FROM "%s"', $this->selection, $this->metric);
 
         if (! $this->metric) {
             throw new \InvalidArgumentException('No metric provided to from()');
