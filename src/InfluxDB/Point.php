@@ -82,10 +82,10 @@ class Point
         $string = $this->measurement;
 
         if (count($this->tags) > 0) {
-            $string .=  ',' . $this->arrayToString($this->escapeCharacters($this->tags));
+            $string .=  ',' . $this->arrayToString($this->escapeTags($this->tags));
         }
 
-        $string .= ' ' . $this->arrayToString($this->escapeCharacters($this->fields));
+        $string .= ' ' . $this->arrayToString($this->escapeFields($this->fields));
 
         if ($this->timestamp) {
             $string .= ' '.$this->timestamp;
@@ -143,7 +143,7 @@ class Point
             if (is_integer($field)) {
                 $field = sprintf('%di', $field);
             } elseif (is_string($field)) {
-                $field = sprintf("\"%s\"", $field);
+                $field = $this->escapeFieldValue($field);
             } elseif (is_bool($field)) {
                 $field = ($field ? "true" : "false");
             }
@@ -174,7 +174,7 @@ class Point
      * @param array $arr
      * @return array
      */
-    private function escapeCharacters(array $arr)
+    private function escapeTags(array $arr)
     {
         $returnArr = [];
 
@@ -183,6 +183,35 @@ class Point
         }
 
         return $returnArr;
+    }
+
+    /**
+     * Escapes invalid characters in field keys and values
+     *
+     * @param array $arr
+     * @return array
+     */
+    private function escapeFields(array $arr)
+    {
+        $returnArr = [];
+
+        foreach($arr as $key => $value) {
+            $returnArr[$this->addSlashes($key)] = $value;
+        }
+
+        return $returnArr;
+    }
+
+    /*
+     * Returns string double-quoted and double-quotes escaped per Influx write protocol syntax
+     *
+     * @param string $value
+     * @return string
+     */
+    private function escapeFieldValue($value)
+    {
+        $escapedValue = str_replace('"', '\"', $value);
+        return sprintf('"%s"', $escapedValue);
     }
 
     /**
@@ -244,7 +273,5 @@ class Point
         }
 
         return true;
-
-
     }
 }
