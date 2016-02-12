@@ -165,7 +165,7 @@ class DatabaseTest extends AbstractTest
             $this->database->getQueryBuilder()
                 ->from('test_metric')
                 ->orderBy('time', 'DESC')->getQuery(),
-            'SELECT * FROM test_metric ORDER BY time DESC');
+            'SELECT * FROM "test_metric" ORDER BY time DESC');
 
         $this->assertEquals(
             $this->database->getQueryBuilder()
@@ -173,7 +173,7 @@ class DatabaseTest extends AbstractTest
                 ->orderBy('time', 'DESC')
                 ->orderBy('some_field', 'ASC')
                 ->getQuery(),
-            'SELECT * FROM test_metric ORDER BY time DESC,some_field ASC');
+            'SELECT * FROM "test_metric" ORDER BY time DESC,some_field ASC');
     }
 
     /**
