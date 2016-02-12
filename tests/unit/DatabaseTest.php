@@ -159,6 +159,23 @@ class DatabaseTest extends AbstractTest
 
     }
 
+    public function testQueryBuilderOrderBy()
+    {
+        $this->assertEquals(
+            $this->database->getQueryBuilder()
+                ->from('test_metric')
+                ->orderBy('time', 'DESC')->getQuery(),
+            'SELECT * FROM test_metric ORDER BY time DESC');
+
+        $this->assertEquals(
+            $this->database->getQueryBuilder()
+                ->from('test_metric')
+                ->orderBy('time', 'DESC')
+                ->orderBy('some_field', 'ASC')
+                ->getQuery(),
+            'SELECT * FROM test_metric ORDER BY time DESC,some_field ASC');
+    }
+
     /**
      * @see https://github.com/influxdata/influxdb-php/pull/36
      */
