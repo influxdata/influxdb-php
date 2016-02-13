@@ -17,12 +17,12 @@
             "email": "stephen@tca0.nl"
         },
         {
-            "name": "Gianluca Arbezzano",
-            "email": "gianarb92@gmail.com"
-        },
-        {
             "name": "Daniel Martinez",
             "email": "danimartcas@hotmail.com"
+        },
+        {
+            "name": "Gianluca Arbezzano",
+            "email": "gianarb92@gmail.com"
         }
     ],
     "require": {
