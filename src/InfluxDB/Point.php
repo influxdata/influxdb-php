@@ -82,10 +82,10 @@ class Point
         $string = $this->measurement;
 
         if (count($this->tags) > 0) {
-            $string .=  ',' . $this->arrayToString($this->escapeTags($this->tags));
+            $string .=  ',' . $this->arrayToString($this->escapeCharacters($this->tags, true));
         }
 
-        $string .= ' ' . $this->arrayToString($this->escapeFields($this->fields));
+        $string .= ' ' . $this->arrayToString($this->escapeCharacters($this->fields, false));
 
         if ($this->timestamp) {
             $string .= ' '.$this->timestamp;
@@ -169,34 +169,18 @@ class Point
     }
 
     /**
-     * Escapes invalid characters in both the array key and array value
+     * Escapes invalid characters in both the array key and optionally the array value
      *
      * @param array $arr
+     * @param bool $escapeValues
      * @return array
      */
-    private function escapeTags(array $arr)
+    private function escapeCharacters(array $arr, $escapeValues)
     {
         $returnArr = [];
 
         foreach ($arr as $key => $value) {
-            $returnArr[$this->addSlashes($key)] = $this->addSlashes($value);
-        }
-
-        return $returnArr;
-    }
-
-    /**
-     * Escapes invalid characters in field keys and values
-     *
-     * @param array $arr
-     * @return array
-     */
-    private function escapeFields(array $arr)
-    {
-        $returnArr = [];
-
-        foreach($arr as $key => $value) {
-            $returnArr[$this->addSlashes($key)] = $value;
+            $returnArr[$this->addSlashes($key)] = $escapeValues ? $this->addSlashes($value) : $value;
         }
 
         return $returnArr;
