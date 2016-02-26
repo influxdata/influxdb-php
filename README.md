@@ -325,6 +325,12 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
+###1.3.0
+* Added quoting of dbname in queries
+* Added orderBy to query builder
+* Fixed wrong orderby tests
+* Travis container-infra and php 7
+
 ###1.2.2
 * Fixed issue with listUsers() method
 * Added more unit tests
