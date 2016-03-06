@@ -6,9 +6,39 @@ php:
   - 5.6
   - 7.0
 
+matrix:
+  fast_finish: true
+  include:
+    - php: 5.5
+      env:
+        - GUZZLE="~5.0"
+        - SYMFONY_EVENT_DISPATCHER="~2.0"
+    - php: 5.5
+      env:
+        - GUZZLE="~5.0"
+        - SYMFONY_EVENT_DISPATCHER="~2.0"
+    - php: 5.6
+      env:
+        - GUZZLE="~5.0"
+        - SYMFONY_EVENT_DISPATCHER="~2.0"
+    - php: 5.6
+      env:
+        - GUZZLE="~5.0"
+        - SYMFONY_EVENT_DISPATCHER="~2.0"
+    - php: 7.0
+      env:
+        - GUZZLE="~5.0"
+        - SYMFONY_EVENT_DISPATCHER="~2.0"
+    - php: 7.0
+      env:
+        - GUZZLE="~5.0"
+        - SYMFONY_EVENT_DISPATCHER="~2.0"
+
 install:
   - composer selfupdate
   - composer install
+  - if [[ $GUZZLE != '' ]]; then composer require --no-update "guzzlehttp/guzzle:$GUZZLE" ; fi
+  - if [[ $SYMFONY_EVENT_DISPATCHER != '' ]]; then composer require --no-update "symfony/event-dispatcher:$SYMFONY_EVENT_DISPATCHER" ; fi
 
 addons:
   code_climate:
