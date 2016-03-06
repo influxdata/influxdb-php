@@ -36,9 +36,9 @@ matrix:
 
 install:
   - composer selfupdate
-  - composer install
-  - if [[ $GUZZLE != '' ]]; then composer require --no-update "guzzlehttp/guzzle:$GUZZLE" ; fi
-  - if [[ $SYMFONY_EVENT_DISPATCHER != '' ]]; then composer require --no-update "symfony/event-dispatcher:$SYMFONY_EVENT_DISPATCHER" ; fi
+  - composer install --prefer-source
+  - if [[ $GUZZLE != '' ]]; then composer require --prefer-source --no-update "guzzlehttp/guzzle:$GUZZLE" ; fi
+  - if [[ $SYMFONY_EVENT_DISPATCHER != '' ]]; then composer require --prefer-source --no-update "symfony/event-dispatcher:$SYMFONY_EVENT_DISPATCHER" ; fi
 
 addons:
   code_climate:
