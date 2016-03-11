@@ -16,7 +16,7 @@ This way there will be a common abstraction library between different programmin
 Installation can be done with composer:
 
 ``` bash
-$ composer require influxdb/influxdb-php:dev-master
+$ composer require influxdb/influxdb-php
 ```
 
 ### NOTE for PHP 5.3 and PHP 5.4 users
