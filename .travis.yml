@@ -6,10 +6,6 @@ php:
   - 5.6
   - 7.0
 
-env:
-  global:
-      - secure: "kK4CVy7xWpjzNcdFOV5DLkO50SoCYnCSRqzTUffc6x+thBBouj//sSSW4oNlM5k2RN6VFozL/ZvWXqE4sXq2WeYqH9S7ZNYbMK2xdAvH/nszfQdV5itjyL5S6u4Qe4z2R2zDLzhMSzVXGwIKbVTQnRdYlKveEjj20bz8D2kbidI="
-
 matrix:
   fast_finish: true
   include:
@@ -40,10 +36,9 @@ matrix:
 
 install:
   - composer selfupdate
-  - composer config -g github-oauth.github.com $GH_TOKEN
-  - composer install --prefer-source
-  - if [[ $GUZZLE != '' ]]; then composer require --prefer-source --no-update "guzzlehttp/guzzle:$GUZZLE" ; fi
-  - if [[ $SYMFONY_EVENT_DISPATCHER != '' ]]; then composer require --prefer-source --no-update "symfony/event-dispatcher:$SYMFONY_EVENT_DISPATCHER" ; fi
+  - composer install --prefer-dist
+  - if [[ $GUZZLE != '' ]]; then composer require --prefer-dist --no-update "guzzlehttp/guzzle:$GUZZLE" ; fi
+  - if [[ $SYMFONY_EVENT_DISPATCHER != '' ]]; then composer require --prefer-dist "symfony/event-dispatcher:$SYMFONY_EVENT_DISPATCHER" ; fi
 
 addons:
   code_climate:
