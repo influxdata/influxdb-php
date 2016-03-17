@@ -23,22 +23,24 @@ matrix:
         - SYMFONY_EVENT_DISPATCHER="~2.0"
     - php: 5.6
       env:
-        - GUZZLE="~5.0"
+        - GUZZLE="~6.0"
         - SYMFONY_EVENT_DISPATCHER="~2.0"
     - php: 7.0
       env:
-        - GUZZLE="~5.0"
+        - GUZZLE="~6.0"
         - SYMFONY_EVENT_DISPATCHER="~2.0"
     - php: 7.0
       env:
-        - GUZZLE="~5.0"
+        - GUZZLE="~6.0"
         - SYMFONY_EVENT_DISPATCHER="~2.0"
+
+before_install:
+  - if [[ $GUZZLE != '' ]]; then composer require --no-update "guzzlehttp/guzzle:$GUZZLE" ; fi
+  - if [[ $SYMFONY_EVENT_DISPATCHER != '' ]]; then composer require --no-update "symfony/event-dispatcher:$SYMFONY_EVENT_DISPATCHER" ; fi
 
 install:
   - composer selfupdate
-  - composer install --prefer-dist
-  - if [[ $GUZZLE != '' ]]; then composer require --prefer-dist --no-update "guzzlehttp/guzzle:$GUZZLE" ; fi
-  - if [[ $SYMFONY_EVENT_DISPATCHER != '' ]]; then composer require --prefer-dist "symfony/event-dispatcher:$SYMFONY_EVENT_DISPATCHER" ; fi
+  - composer install --no-interaction --ignore-platform-reqs
 
 addons:
   code_climate:
