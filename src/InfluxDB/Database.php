@@ -2,6 +2,7 @@
 
 namespace InfluxDB;
 
+use Exception;
 use InfluxDB\Database\Exception as DatabaseException;
 use InfluxDB\Database\RetentionPolicy;
 use InfluxDB\Query\Builder as QueryBuilder;
@@ -96,7 +97,7 @@ class Database
             if ($retentionPolicy) {
                 $this->createRetentionPolicy($retentionPolicy);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new DatabaseException(
                 sprintf('Failed to created database %s', $this->name),
                 $e->getCode(),
