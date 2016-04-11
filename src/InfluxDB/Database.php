@@ -117,12 +117,14 @@ class Database
     /**
      * Writes points into InfluxDB
      *
-     * @param  Point[] $points    Array of points
-     * @param  string  $precision The timestamp precision (defaults to nanoseconds)
+     * @param  Point[]     $points           Array of Point objects
+     * @param  string|null $precision        The timestamp precision (defaults to nanoseconds)
+     * @param  string|null $retentionPolicy  Specifies an explicit retention policy to use when writing all points. If
+     *                                       not set, the default retention period will be used.
      * @return bool
-     * @throws Exception
+     * @throws \Exception
      */
-    public function writePoints(array $points, $precision = self::PRECISION_NANOSECONDS)
+    public function writePoints(array $points, $precision = self::PRECISION_NANOSECONDS, $retentionPolicy = null)
     {
         $payload = array_map(
             function (Point $point) {
@@ -137,10 +139,13 @@ class Database
                 'database' => $this->name,
                 'method' => 'post'
             ];
+            if ($retentionPolicy !== null) {
+                $parameters['url'] .= sprintf('&rp=%s', $retentionPolicy);
+            }
 
             return $this->client->write($parameters, $payload);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new Exception($e->getMessage(), $e->getCode());
         }
     }
