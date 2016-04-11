@@ -3,6 +3,8 @@
 namespace InfluxDB;
 
 use Exception;
+use InvalidArgumentException;
+use InfluxDB\Exception as InfluxDBException;
 use InfluxDB\Database\Exception as DatabaseException;
 use InfluxDB\Database\RetentionPolicy;
 use InfluxDB\Query\Builder as QueryBuilder;
@@ -42,11 +44,13 @@ class Database
      *
      * @param string $name
      * @param Client $client
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($name, Client $client)
     {
         if (empty($name)) {
-            throw new \InvalidArgumentException('No database name provided');
+            throw new InvalidArgumentException('No database name provided');
         }
 
         $this->name = (string) $name;
@@ -123,7 +127,8 @@ class Database
      * @param  string|null $retentionPolicy  Specifies an explicit retention policy to use when writing all points. If
      *                                       not set, the default retention period will be used.
      * @return bool
-     * @throws \Exception
+     *
+     * @throws \InfluxDB\Exception
      */
     public function writePoints(array $points, $precision = self::PRECISION_NANOSECONDS, $retentionPolicy = null)
     {
@@ -147,7 +152,7 @@ class Database
             return $this->client->write($parameters, $payload);
 
         } catch (Exception $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+            throw new InfluxDBException($e->getMessage(), $e->getCode());
         }
     }
 
