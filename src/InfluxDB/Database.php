@@ -82,8 +82,7 @@ class Database
      * Create this database
      *
      * @param  RetentionPolicy $retentionPolicy
-     * @param bool             $createIfNotExists Only create the database if it does not yet exist
-     *
+     * @param  bool            $createIfNotExists Only create the database if it does not yet exist
      * @return ResultSet
      * @throws DatabaseException
      */
@@ -123,11 +122,10 @@ class Database
      * Writes points into InfluxDB
      *
      * @param  Point[]     $points           Array of Point objects
-     * @param  string|null $precision        The timestamp precision (defaults to nanoseconds)
+     * @param  string      $precision        The timestamp precision (defaults to nanoseconds)
      * @param  string|null $retentionPolicy  Specifies an explicit retention policy to use when writing all points. If
      *                                       not set, the default retention period will be used.
      * @return bool
-     *
      * @throws \InfluxDB\Exception
      */
     public function writePoints(array $points, $precision = self::PRECISION_NANOSECONDS, $retentionPolicy = null)
