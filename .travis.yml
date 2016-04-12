@@ -8,7 +8,7 @@ php:
 
 install:
   - composer selfupdate
-  - composer install
+  - composer install --no-interaction
 
 addons:
   code_climate:
