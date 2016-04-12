@@ -2,6 +2,9 @@
 
 namespace InfluxDB;
 
+use Exception;
+use InvalidArgumentException;
+use InfluxDB\Exception as InfluxDBException;
 use InfluxDB\Database\Exception as DatabaseException;
 use InfluxDB\Database\RetentionPolicy;
 use InfluxDB\Query\Builder as QueryBuilder;
@@ -41,11 +44,13 @@ class Database
      *
      * @param string $name
      * @param Client $client
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($name, Client $client)
     {
         if (empty($name)) {
-            throw new \InvalidArgumentException('No database name provided');
+            throw new InvalidArgumentException('No database name provided');
         }
 
         $this->name = (string) $name;
@@ -77,8 +82,7 @@ class Database
      * Create this database
      *
      * @param  RetentionPolicy $retentionPolicy
-     * @param bool             $createIfNotExists Only create the database if it does not yet exist
-     *
+     * @param  bool            $createIfNotExists Only create the database if it does not yet exist
      * @return ResultSet
      * @throws DatabaseException
      */
@@ -96,7 +100,7 @@ class Database
             if ($retentionPolicy) {
                 $this->createRetentionPolicy($retentionPolicy);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new DatabaseException(
                 sprintf('Failed to created database %s', $this->name),
                 $e->getCode(),
@@ -117,12 +121,14 @@ class Database
     /**
      * Writes points into InfluxDB
      *
-     * @param  Point[] $points    Array of points
-     * @param  string  $precision The timestamp precision (defaults to nanoseconds)
+     * @param  Point[]     $points           Array of Point objects
+     * @param  string      $precision        The timestamp precision (defaults to nanoseconds)
+     * @param  string|null $retentionPolicy  Specifies an explicit retention policy to use when writing all points. If
+     *                                       not set, the default retention period will be used.
      * @return bool
-     * @throws Exception
+     * @throws \InfluxDB\Exception
      */
-    public function writePoints(array $points, $precision = self::PRECISION_NANOSECONDS)
+    public function writePoints(array $points, $precision = self::PRECISION_NANOSECONDS, $retentionPolicy = null)
     {
         $payload = array_map(
             function (Point $point) {
@@ -137,11 +143,14 @@ class Database
                 'database' => $this->name,
                 'method' => 'post'
             ];
+            if ($retentionPolicy !== null) {
+                $parameters['url'] .= sprintf('&rp=%s', $retentionPolicy);
+            }
 
             return $this->client->write($parameters, $payload);
 
-        } catch (\Exception $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+        } catch (Exception $e) {
+            throw new InfluxDBException($e->getMessage(), $e->getCode());
         }
     }
 
