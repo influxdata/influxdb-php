@@ -151,12 +151,12 @@ class Database
      *   2) Inserting very large set of points into a measurement where looping via array_map() actually
      *      hurts performance as the payload may be calculated in advance by caller.
      *
-     * @param  string      $payload          InfluxDB payload that conforms to the Line syntax.
-     * @param  string      $precision        The timestamp precision (defaults to nanoseconds).
-     * @param  string|null $retentionPolicy  Specifies an explicit retention policy to use when writing all points. If
-     *                                       not set, the default retention period will be used. This is only
-     *                                       applicable for the Guzzle driver. The UDP driver utilizes the endpoint
-     *                                       configuration defined in the server's influxdb configuration file.
+     * @param  string|array  $payload          InfluxDB payload (Or array of payloads) that conform to the Line syntax.
+     * @param  string        $precision        The timestamp precision (defaults to nanoseconds).
+     * @param  string|null   $retentionPolicy  Specifies an explicit retention policy to use when writing all points. If
+     *                                         not set, the default retention period will be used. This is only
+     *                                         applicable for the Guzzle driver. The UDP driver utilizes the endpoint
+     *                                         configuration defined in the server's influxdb configuration file.
      * @return bool
      * @throws \InfluxDB\Exception
      */

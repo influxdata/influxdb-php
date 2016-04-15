@@ -205,8 +205,8 @@ class Client
     /**
      * Write data
      *
-     * @param array           $parameters
-     * @param string          $payload
+     * @param array        $parameters
+     * @param string|array $payload     InfluxDB payload (Or array of payloads) that conform to the Line syntax.
      *
      * @return bool
      */
@@ -224,7 +224,11 @@ class Client
         $driver->setParameters($parameters);
 
         // send the points to influxDB
-        $driver->write(implode("\n", $payload));
+        if (is_array($payload)) {
+            $driver->write(implode("\n", $payload));
+        } else {
+            $driver->write($payload);
+        }
 
         return $driver->isSuccess();
     }
