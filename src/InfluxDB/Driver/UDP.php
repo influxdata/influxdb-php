@@ -51,7 +51,7 @@ class UDP implements DriverInterface
     }
 
     /**
-     * {@inheritdoc }
+     * {@inheritdoc}
      */
     public function setParameters(array $parameters)
     {
@@ -59,7 +59,7 @@ class UDP implements DriverInterface
     }
 
     /**
-     * {@inheritdoc }
+     * {@inheritdoc}
      */
     public function getParameters()
     {
@@ -67,7 +67,7 @@ class UDP implements DriverInterface
     }
 
     /**
-     * {@inheritdoc }
+     * {@inheritdoc}
      */
     public function write($data = null)
     {
@@ -81,7 +81,7 @@ class UDP implements DriverInterface
     }
 
     /**
-     * {@inheritdoc }
+     * {@inheritdoc}
      */
     public function isSuccess()
     {
