@@ -267,7 +267,7 @@ class Client
      * @param  int    $timeout
      * @param  bool   $verifySSL
      *
-*@return Client|Database
+     * @return Client|Database
      * @throws ClientException
      */
     public static function fromDSN($dsn, $timeout = 0, $verifySSL = false)

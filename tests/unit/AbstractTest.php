@@ -99,6 +99,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         $mock = new MockHandler([
             new Response(200, array(), $body),
             new Response(200, array(), $body),
+            new Response(200, array(), $body),
             new Response(400, array(), 'fault{'),
             new Response(400, array(), $body),
             new Response(400, array(), $body),

@@ -4,11 +4,8 @@ namespace InfluxDB\Test;
 
 use InfluxDB\Client;
 use InfluxDB\Database;
-use InfluxDB\Driver\Guzzle;
 use InfluxDB\Point;
 use InfluxDB\ResultSet;
-use PHPUnit_Framework_MockObject_MockObject;
-use PHPUnit_Framework_TestCase;
 
 class DatabaseTest extends AbstractTest
 {
@@ -148,6 +145,14 @@ class DatabaseTest extends AbstractTest
         );
 
         $this->assertEquals(true, $this->database->writePoints(array($point1, $point2)));
+
+        $payload = [
+            (string) $point1,
+            (string) $point2
+        ];
+
+        $this->assertEquals(true, $this->database->writePayload($payload));
+
 
         $this->mockClient->expects($this->once())
             ->method('write')
