@@ -5,8 +5,6 @@
 
 namespace InfluxDB\Driver;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
-
 /**
  * Class UDP
  *
@@ -27,6 +25,12 @@ class UDP implements DriverInterface
     private $config;
 
     /**
+     *
+     * @var resource
+     */
+    private $stream;
+
+    /**
      * @param string $host IP/hostname of the InfluxDB host
      * @param int    $port Port of the InfluxDB process
      */
@@ -34,24 +38,20 @@ class UDP implements DriverInterface
     {
         $this->config['host'] = $host;
         $this->config['port'] = $port;
-
-
     }
 
     /**
-     * Called by the client write() method, will pass an array of required parameters such as db name
-     *
-     * will contain the following parameters:
-     *
-     * [
-     *  'database' => 'name of the database',
-     *  'url' => 'URL to the resource',
-     *  'method' => 'HTTP method used'
-     * ]
-     *
-     * @param array $parameters
-     *
-     * @return mixed
+     * Close the stream (if created)
+     */
+    public function __destruct()
+    {
+        if (isset($this->stream) && is_resource($this->stream)) {
+            fclose($this->stream);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function setParameters(array $parameters)
     {
@@ -59,7 +59,7 @@ class UDP implements DriverInterface
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getParameters()
     {
@@ -67,32 +67,36 @@ class UDP implements DriverInterface
     }
 
     /**
-     * Send the data
-     *
-     * @param $data
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function write($data = null)
     {
+        if (isset($this->stream) === false) {
+            $this->createStream();
+        }
 
-        $host = sprintf('udp://%s:%d', $this->config['host'], $this->config['port']);
-
-        // stream the data using UDP and suppress any errors
-        $stream = @stream_socket_client($host);
-        @stream_socket_sendto($stream, $data);
-        @fclose($stream);
+        @stream_socket_sendto($this->stream, $data);
 
         return true;
     }
 
     /**
-     * Should return if sending the data was successful
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isSuccess()
     {
         return true;
     }
+
+    /**
+     * Create the resource stream
+     */
+    protected function createStream()
+    {
+        $host = sprintf('udp://%s:%d', $this->config['host'], $this->config['port']);
+
+        // stream the data using UDP and suppress any errors
+        $this->stream = @stream_socket_client($host);
+    }
+
 }

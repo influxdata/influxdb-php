@@ -78,7 +78,6 @@ class Point
      */
     public function __toString()
     {
-
         $string = $this->measurement;
 
         if (count($this->tags) > 0) {
@@ -225,7 +224,6 @@ class Point
      */
     private function isValidTimeStamp($timestamp)
     {
-
         // if the code is run on a 32bit system, loosely check if the timestamp is a valid numeric
         if (PHP_INT_SIZE == 4 && is_numeric($timestamp)) {
             return true;
@@ -244,7 +242,5 @@ class Point
         }
 
         return true;
-
-
     }
 }

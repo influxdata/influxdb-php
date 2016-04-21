@@ -7,8 +7,6 @@ namespace InfluxDB\Driver;
 
 use GuzzleHttp\Client;
 use Guzzle\Http\Message\Response;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Request;
 use InfluxDB\ResultSet;
 
 /**

@@ -67,7 +67,8 @@ class ClientTest extends AbstractTest
         $bodyResponse = file_get_contents(dirname(__FILE__) . '/json/result.example.json');
         $httpMockClient = $this->buildHttpMockClient($bodyResponse);
 
-        $client->setDriver(new Guzzle($httpMockClient));
+        $guzzle = new Guzzle($httpMockClient);
+        $client->setDriver($guzzle);
 
         /** @var \InfluxDB\ResultSet $result */
         $result = $client->query('somedb', $query);
@@ -78,6 +79,8 @@ class ClientTest extends AbstractTest
         $this->assertEquals('somedb', $parameters['database']);
         $this->assertInstanceOf('\InfluxDB\ResultSet', $result);
 
+        $point = new Point('test', 1.0);
+
         $this->assertEquals(
             true,
             $client->write(
@@ -86,7 +89,19 @@ class ClientTest extends AbstractTest
                     'database' => 'influx_test_db',
                     'method' => 'post'
                 ],
-                [new Point('test', 1.0)]
+                (string) $point
+            )
+        );
+
+        $this->assertEquals(
+            true,
+            $client->write(
+                [
+                    'url' => 'http://localhost',
+                    'database' => 'influx_test_db',
+                    'method' => 'post'
+                ],
+                [(string) $point]
             )
         );
 

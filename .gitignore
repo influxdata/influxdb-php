@@ -4,3 +4,4 @@ vendor/
 .idea
 build/
 test.php
+.project
