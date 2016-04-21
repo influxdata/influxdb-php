@@ -325,6 +325,12 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
+###1.4.0
+* Updating Influx Database with support for writing direct payloads, thanks @virgofx 
+
+###1.3.1
+* Added ability to write data to a specific retention policy, thanks @virgofx !
+
 ###1.3.0
 * Added quoting of dbname in queries
 * Added orderBy to query builder
