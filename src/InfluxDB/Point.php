@@ -81,10 +81,10 @@ class Point
         $string = $this->measurement;
 
         if (count($this->tags) > 0) {
-            $string .=  ',' . $this->arrayToString($this->escapeCharacters($this->tags));
+            $string .=  ',' . $this->arrayToString($this->escapeCharacters($this->tags, true));
         }
 
-        $string .= ' ' . $this->arrayToString($this->escapeCharacters($this->fields));
+        $string .= ' ' . $this->arrayToString($this->escapeCharacters($this->fields, false));
 
         if ($this->timestamp) {
             $string .= ' '.$this->timestamp;
@@ -142,7 +142,7 @@ class Point
             if (is_integer($field)) {
                 $field = sprintf('%di', $field);
             } elseif (is_string($field)) {
-                $field = sprintf("\"%s\"", $field);
+                $field = $this->escapeFieldValue($field);
             } elseif (is_bool($field)) {
                 $field = ($field ? "true" : "false");
             }
@@ -168,20 +168,33 @@ class Point
     }
 
     /**
-     * Escapes invalid characters in both the array key and array value
+     * Escapes invalid characters in both the array key and optionally the array value
      *
      * @param array $arr
+     * @param bool $escapeValues
      * @return array
      */
-    private function escapeCharacters(array $arr)
+    private function escapeCharacters(array $arr, $escapeValues)
     {
         $returnArr = [];
 
         foreach ($arr as $key => $value) {
-            $returnArr[$this->addSlashes($key)] = $this->addSlashes($value);
+            $returnArr[$this->addSlashes($key)] = $escapeValues ? $this->addSlashes($value) : $value;
         }
 
         return $returnArr;
+    }
+
+    /*
+     * Returns string double-quoted and double-quotes escaped per Influx write protocol syntax
+     *
+     * @param string $value
+     * @return string
+     */
+    private function escapeFieldValue($value)
+    {
+        $escapedValue = str_replace('"', '\"', $value);
+        return sprintf('"%s"', $escapedValue);
     }
 
     /**
