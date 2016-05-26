@@ -325,6 +325,9 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
+###1.4.1
+* Fixed bug: Escape field values as per line protocol. 
+
 ###1.4.0
 * Updating Influx Database with support for writing direct payloads, thanks @virgofx 
 
