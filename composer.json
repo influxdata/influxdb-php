@@ -1,9 +1,10 @@
 {
-    "name": "influxdb/influxdb-php",
+    "name": "influxdata/influxdb-php",
     "description": "InfluxDB client library for PHP",
     "license": "MIT",
     "keywords": [
         "influxdb",
+        "influxdata",
         "client",
         "time series",
         "influxdb client",
