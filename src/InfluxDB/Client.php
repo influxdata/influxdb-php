@@ -293,8 +293,8 @@ class Client
         $client = new self(
             $connParams['host'],
             $connParams['port'],
-            $connParams['user'],
-            $connParams['pass'],
+            isset($connParams['user']) ? $connParams['user'] : '',
+            isset($connParams['pass']) ? $connParams['pass'] : '',
             $ssl,
             $verifySSL,
             $timeout
