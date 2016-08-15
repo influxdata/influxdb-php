@@ -44,7 +44,7 @@ class Client
     protected $password = '';
 
     /**
-     * @var int
+     * @var float
      */
     protected $timeout = 0;
 
@@ -118,7 +118,7 @@ class Client
         $this->port = (int) $port;
         $this->username = (string) $username;
         $this->password = (string) $password;
-        $this->timeout = (int) $timeout;
+        $this->timeout = (float) $timeout;
         $this->verifySSL = (bool) $verifySSL;
 
         if ($ssl) {
@@ -317,7 +317,7 @@ class Client
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getTimeout()
     {
