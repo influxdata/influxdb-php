@@ -142,6 +142,14 @@ class ClientTest extends AbstractTest
 
     }
 
+    public function testTimeoutIsFloat()
+    {
+        $client =  $this->getClient('test', 'test', false, 0.5);
+
+        $this->assertEquals(0.5, $client->getTimeout());
+    }
+
+
     /**
      * @param string $responseFile
      * @param array  $result
@@ -162,12 +170,13 @@ class ClientTest extends AbstractTest
      * @param string     $username
      * @param string     $password
      * @param bool|false $ssl
+     * @param int $timeout
      *
      * @return Client
      */
-    protected function getClient($username = '', $password = '',  $ssl = false)
+    protected function getClient($username = '', $password = '',  $ssl = false, $timeout = 0)
     {
-        return new Client('localhost', 8086, $username, $password, $ssl);
+        return new Client('localhost', 8086, $username, $password, $ssl, false, $timeout);
     }
 
 }
