@@ -39,7 +39,7 @@ class Point
      * @param  float  $value
      * @param  array  $tags
      * @param  array  $additionalFields
-     * @param  null   $timestamp
+     * @param  int    $timestamp
      * @throws DatabaseException
      */
     public function __construct(
