@@ -74,11 +74,6 @@ class Client
     protected $baseURI;
 
     /**
-     * @var \Guzzle\Http\Client
-     */
-    protected $httpClient;
-
-    /**
      * @var array
      */
     protected $options = array();
