@@ -207,7 +207,7 @@ class Client
      */
     public function write(array $parameters, $payload)
     {
-        // retrive the driver
+        // retrieve the driver
         $driver = $this->getDriver();
 
         // add authentication to the driver if needed
