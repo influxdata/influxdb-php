@@ -54,7 +54,7 @@ class Point
         }
 
         $this->measurement = (string) $measurement;
-        $this->tags = $tags;
+        $this->setTags($tags);
         $fields = $additionalFields;
 
         if ($value !== null) {
@@ -122,6 +122,15 @@ class Point
      */
     public function setTags($tags)
     {
+        foreach ($tags as &$tag) {
+            if ($tag === '') {
+                $tag = '""';
+            } elseif (is_bool($tag)) {
+                $tag = ($tag ? "true" : "false");
+            } elseif (is_null($tag)) {
+                $tag = ("null");
+            }
+        }
         $this->tags = $tags;
     }
 
@@ -145,6 +154,8 @@ class Point
                 $field = $this->escapeFieldValue($field);
             } elseif (is_bool($field)) {
                 $field = ($field ? "true" : "false");
+            } elseif (is_null($field)) {
+                $field = ("null");
             }
         }
 
