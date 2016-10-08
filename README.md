@@ -325,6 +325,14 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
+###1.4.2
+* Fix Notice when calling InfluxDB\Client::fromDSN without username or password
+* fixed Guzzle client timeout is float
+* Fix annotation
+* Remove unused property
+* Fixed misspelling
+* Fixed tag with Boolean/Null value trigger parse error
+
 ###1.4.1
 * Fixed bug: Escape field values as per line protocol. 
 
