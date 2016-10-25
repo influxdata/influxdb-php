@@ -311,6 +311,14 @@ class Client
     }
 
     /**
+     * @return bool
+     */
+    public function getVerifySSL()
+    {
+        return $this->verifySSL;
+    }
+
+    /**
      * @param Driver\DriverInterface $driver
      */
     public function setDriver(DriverInterface $driver)
