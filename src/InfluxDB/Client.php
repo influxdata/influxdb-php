@@ -124,16 +124,8 @@ class Client
         // the the base URI
         $this->baseURI = sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port);
 
-        // set the default driver to guzzle
-        $this->driver = new Guzzle(
-            new \GuzzleHttp\Client(
-                [
-                    'timeout' => $this->timeout,
-                    'base_uri' => $this->baseURI,
-                    'verify' => $this->verifySSL
-                ]
-            )
-        );
+        // delay driver instantiation until it's actually needed
+        $this->driver = null;
 
         $this->admin = new Admin($this);
     }
@@ -161,16 +153,15 @@ class Client
      */
     public function query($database, $query, $parameters = [])
     {
+        $driver = $this->getDriver();
 
-        if (!$this->driver instanceof QueryDriverInterface) {
+        if (!$driver instanceof QueryDriverInterface) {
             throw new Exception('The currently configured driver does not support query operations');
         }
 
         if ($database) {
             $parameters['db'] = $database;
         }
-
-        $driver = $this->getDriver();
 
         $parameters = [
             'url' => 'query?' . http_build_query(array_merge(['q' => $query], $parameters)),
@@ -332,6 +323,21 @@ class Client
      */
     public function getDriver()
     {
+        if ($this->driver !== null) {
+            return $this->driver;
+        }
+
+        // set the default driver to guzzle
+        $this->driver = new Guzzle(
+            new \GuzzleHttp\Client(
+                [
+                    'timeout' => $this->timeout,
+                    'base_uri' => $this->baseURI,
+                    'verify' => $this->verifySSL
+                ]
+            )
+        );
+
         return $this->driver;
     }
 
