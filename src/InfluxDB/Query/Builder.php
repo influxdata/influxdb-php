@@ -53,6 +53,11 @@ class Builder
     /**
      * @var string
      */
+    protected $retentionPolicy;
+
+    /**
+     * @var string
+     */
     protected $metric;
 
     /**
@@ -239,6 +244,20 @@ class Builder
     public function limit($count)
     {
         $this->limitClause = sprintf(' LIMIT %s', (int) $count);
+
+        return $this;
+    }
+
+    /**
+     * Limit the ResultSet to n records
+     *
+     * @param string $rp
+     *
+     * @return $this
+     */
+    public function retentionPolicy($rp) 
+    {
+        $this->retentionPolicy =  $rp;
 
         return $this;
     }
