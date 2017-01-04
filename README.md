@@ -325,7 +325,10 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
-###1.4.2
+###1.14.3
+* Deprecate IF NOT EXISTS clause in database creation
+
+###1.14.2
 * Fix Notice when calling InfluxDB\Client::fromDSN without username or password
 * fixed Guzzle client timeout is float
 * Fix annotation
