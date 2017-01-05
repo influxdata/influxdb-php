@@ -155,7 +155,7 @@ class Point
             } elseif (is_bool($field)) {
                 $field = ($field ? "true" : "false");
             } elseif (is_null($field)) {
-                $field = ("null");
+                $field = $this->escapeFieldValue("null");
             }
         }
 
