@@ -18,12 +18,18 @@ class ResultSet
     protected $parsedResults = [];
 
     /**
+     * @var string
+     */
+    protected $rawResults = '';
+
+    /**
      * @param string $raw
      * @throws \InvalidArgumentException
      * @throws Exception
      */
     public function __construct($raw)
     {
+        $this->rawResults = $raw;
         $this->parsedResults = json_decode((string) $raw, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -39,6 +45,13 @@ class ResultSet
         if (isset($this->parsedResults['results'][0]['error'])) {
             throw new ClientException($this->parsedResults['results'][0]['error']);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getRaw() {
+      return $this->rawResults;
     }
 
     /**
