@@ -53,6 +53,11 @@ class Builder
     /**
      * @var string
      */
+    protected $retentionPolicy;
+
+    /**
+     * @var string
+     */
     protected $metric;
 
     /**
@@ -244,6 +249,20 @@ class Builder
     }
 
     /**
+     * Add retention policy to query
+     *
+     * @param string $rp
+     *
+     * @return $this
+     */
+    public function retentionPolicy($rp)
+    {
+        $this->retentionPolicy =  $rp;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getQuery()
@@ -266,7 +285,13 @@ class Builder
      */
     protected function parseQuery()
     {
-        $query = sprintf('SELECT %s FROM "%s"', $this->selection, $this->metric);
+        $rp = '';
+
+        if (is_string($this->retentionPolicy) && !empty($this->retentionPolicy)) {
+            $rp = sprintf('"%s".', $this->retentionPolicy);
+        }
+
+        $query = sprintf('SELECT %s FROM %s"%s"', $this->selection, $rp, $this->metric);
 
         if (! $this->metric) {
             throw new \InvalidArgumentException('No metric provided to from()');
