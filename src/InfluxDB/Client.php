@@ -283,7 +283,7 @@ class Client
         }
 
         $ssl = $modifier === 'https' ? true : false;
-        $dbName = $connParams['path'] ? substr($connParams['path'], 1) : null;
+        $dbName = isset($connParams['path']) ? substr($connParams['path'], 1) : null;
 
         $client = new self(
             $connParams['host'],
