@@ -49,5 +49,8 @@
         "psr-4": {
             "InfluxDB\\Test\\": "tests"
         }
+    },
+    "suggest": {
+        "stefanotorresi/influxdb-php-async": "An asyncronous client for InfluxDB, implemented via ReactPHP."
     }
 }
