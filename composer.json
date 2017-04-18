@@ -28,8 +28,10 @@
     ],
     "require": {
         "php": "^5.5 | ^7.0",
-        "guzzlehttp/guzzle": "6.*",
         "symfony/event-dispatcher": "2.*|3.*"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "Allows using the HTTP driver"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.0",
