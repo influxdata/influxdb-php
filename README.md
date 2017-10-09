@@ -117,7 +117,7 @@ $points = array(
 $result = $database->writePoints($points, Database::PRECISION_SECONDS);
 ```
 
-It's possible to add multiple [fields](https://influxdb.com/docs/v0.9/concepts/key_concepts.html) when writing
+It's possible to add multiple [fields](https://docs.influxdata.com/influxdb/latest/concepts/key_concepts/) when writing
 measurements to InfluxDB. The point class allows one to easily write data in batches to influxDB.
 
 The name of a measurement and the value are mandatory. Additional fields, tags and a timestamp are optional.
