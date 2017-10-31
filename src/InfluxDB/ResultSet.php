@@ -70,7 +70,9 @@ class ResultSet
                 || (isset($serie['tags']) && array_intersect($tags, $serie['tags'])))
                 && isset($serie['values'])
             ) {
-                $points = array_merge($points, $this->getPointsFromSerie($serie));
+                foreach ($this->getPointsFromSerie($serie) as $point) {
+                    $points[] = $point;
+                }
             }
         }
 
