@@ -28,6 +28,7 @@ class ClientTest extends AbstractTest
         $this->assertInstanceOf('InfluxDB\Driver\Guzzle', $client->getDriver());
         $this->assertEquals('localhost', $client->getHost());
         $this->assertEquals('0', $client->getTimeout());
+        $this->assertFalse($client->getVerifySSL());
     }
 
     public function testBaseURl()
@@ -144,9 +145,16 @@ class ClientTest extends AbstractTest
 
     public function testTimeoutIsFloat()
     {
-        $client =  $this->getClient('test', 'test', false, 0.5);
+        $client =  $this->getClient('test', 'test', false, false, 0.5);
 
         $this->assertEquals(0.5, $client->getTimeout());
+    }
+
+    public function testVerifySSLIsBoolean()
+    {
+        $client =  $this->getClient('test', 'test', true, true);
+
+        $this->assertTrue($client->getVerifySSL());
     }
 
 
@@ -174,9 +182,9 @@ class ClientTest extends AbstractTest
      *
      * @return Client
      */
-    protected function getClient($username = '', $password = '',  $ssl = false, $timeout = 0)
+    protected function getClient($username = '', $password = '',  $ssl = false, $verifySSL = false, $timeout = 0)
     {
-        return new Client('localhost', 8086, $username, $password, $ssl, false, $timeout);
+        return new Client('localhost', 8086, $username, $password, $ssl, $verifySSL, $timeout);
     }
 
 }
