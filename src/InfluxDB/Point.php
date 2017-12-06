@@ -236,7 +236,13 @@ class Point
         $strParts = [];
 
         foreach ($arr as $key => $value) {
-            $strParts[] = sprintf('%s=%s', $key, $value);
+            switch (gettype($value)) {
+                case 'double':
+                    $strParts[] = sprintf('%s=%f', $key, $value);
+                    break;
+                default:
+                    $strParts[] = sprintf('%s=%s', $key, $value);
+            }
         }
 
         return implode(',', $strParts);
