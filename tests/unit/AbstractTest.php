@@ -137,4 +137,19 @@ abstract class AbstractTest extends TestCase
 
         return $mockClient;
     }
+
+    /**
+     * We need this to be compatible with PHPUnit 4.8, 5.x and 6x.
+     * To be removed when we drop support for PHP 5.5.
+     *
+     * @param string $class
+     */
+    public function expectException($class)
+    {
+        if (is_callable('parent::expectException')) {
+            parent::expectException($class);
+        } else {
+            $this->setExpectedException($class);
+        }
+    }
 }
