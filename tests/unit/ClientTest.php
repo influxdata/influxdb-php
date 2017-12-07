@@ -8,7 +8,6 @@ use InfluxDB\Point;
 
 class ClientTest extends AbstractTest
 {
-
     /**
      *
      */

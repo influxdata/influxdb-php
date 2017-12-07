@@ -6,11 +6,9 @@ use InfluxDB\Client;
 use InfluxDB\Database;
 use InfluxDB\Point;
 use InfluxDB\ResultSet;
-use PHPUnit\Framework\Error\Deprecated;
 
 class DatabaseTest extends AbstractTest
 {
-
     /**
      * @var string
      */

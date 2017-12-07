@@ -12,6 +12,7 @@ use InfluxDB\Client;
 use InfluxDB\Database;
 use InfluxDB\Driver\Guzzle as GuzzleDriver;
 use InfluxDB\ResultSet;
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\Response;
@@ -19,7 +20,7 @@ use GuzzleHttp\Psr7\Response;
 /**
  * @property mixed resultData
  */
-abstract class AbstractTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractTest extends TestCase
 {
 
     /** @var  Client|PHPUnit_Framework_MockObject_MockObject $client */

@@ -12,8 +12,6 @@ use PHPUnit_Framework_TestCase;
 
 class AdminTest extends AbstractTest
 {
-
-
     /**
      *
      */
