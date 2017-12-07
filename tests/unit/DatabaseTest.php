@@ -112,7 +112,7 @@ class DatabaseTest extends AbstractTest
 
 
         // test an exception being handled correctly
-        $this->setExpectedException('\InfluxDB\Database\Exception');
+        $this->expectException('\InfluxDB\Database\Exception');
         $this->database->create($this->getTestRetentionPolicy('influx_test_db'), false);
 
     }
@@ -162,7 +162,7 @@ class DatabaseTest extends AbstractTest
             ->method('write')
             ->will($this->throwException(new \Exception('Test exception')));
 
-        $this->setExpectedException('InfluxDB\Exception');
+        $this->expectException('InfluxDB\Exception');
 
         $this->database->writePoints(array($point1, $point2));
 
