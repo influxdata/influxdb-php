@@ -6,6 +6,7 @@ use InfluxDB\Client;
 use InfluxDB\Database;
 use InfluxDB\Point;
 use InfluxDB\ResultSet;
+use PHPUnit\Framework\Error\Deprecated;
 
 class DatabaseTest extends AbstractTest
 {
@@ -83,7 +84,8 @@ class DatabaseTest extends AbstractTest
     }
 
     /**
-     * @expectedException \PHPUnit_Framework_Error_Deprecated
+     * @group legacy
+     * @expectedDeprecation Unsilenced deprecation: The $createIfNotExists parameter to Database::create is deprecated
      */
     public function testIfNotExistsDeprecation()
     {
