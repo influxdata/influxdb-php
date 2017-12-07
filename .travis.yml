@@ -31,7 +31,7 @@ matrix:
           env: DEPENDENCIES="dunglas/symfony-lock:^2"
         - php: 7.2
           env: DEPENDENCIES="dunglas/symfony-lock:^3"
-         - php: 7.2
+        - php: 7.2
           env: DEPENDENCIES="dunglas/symfony-lock:^4"
 
           # Latest commit to master
