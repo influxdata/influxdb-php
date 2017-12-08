@@ -2,8 +2,9 @@
 namespace InfluxDB\Test;
 
 use InfluxDB\ResultSet;
+use PHPUnit\Framework\TestCase;
 
-class ResultSetTest extends \PHPUnit_Framework_TestCase
+class ResultSetTest extends TestCase
 {
     /** @var ResultSet  $resultSet*/
     protected $resultSet;

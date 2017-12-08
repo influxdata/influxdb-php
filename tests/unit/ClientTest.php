@@ -8,7 +8,6 @@ use InfluxDB\Point;
 
 class ClientTest extends AbstractTest
 {
-
     /**
      *
      */
@@ -106,10 +105,10 @@ class ClientTest extends AbstractTest
             )
         );
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->expectException('\InvalidArgumentException');
         $client->query('test', 'bad-query');
 
-        $this->setExpectedException('\InfluxDB\Driver\Exception');
+        $this->expectException('\InfluxDB\Driver\Exception');
         $client->query('test', 'bad-query');
     }
 
