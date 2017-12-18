@@ -238,7 +238,8 @@ class Point
         foreach ($arr as $key => $value) {
             switch (gettype($value)) {
                 case 'double':
-                    $strParts[] = sprintf('%s=%f', $key, $value);
+                    //TODO: Make float precision more dynamic.
+                    $strParts[] = sprintf('%s=%.8F', $key, $value);
                     break;
                 default:
                     $strParts[] = sprintf('%s=%s', $key, $value);
