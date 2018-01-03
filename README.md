@@ -325,10 +325,16 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
-###1.14.3
+#### 1.14.4
+- Update key concepts link to point to the proper place.
+- Replace costly array_merge calls with foreach + array operator
+- Add getter method for verifySSL
+- Support for Symfony 4
+
+#### 1.14.3
 * Deprecate IF NOT EXISTS clause in database creation
 
-###1.14.2
+#### 1.14.2
 * Fix Notice when calling InfluxDB\Client::fromDSN without username or password
 * fixed Guzzle client timeout is float
 * Fix annotation
@@ -336,60 +342,60 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 * Fixed misspelling
 * Fixed tag with Boolean/Null value trigger parse error
 
-###1.4.1
+#### 1.4.1
 * Fixed bug: Escape field values as per line protocol. 
 
-###1.4.0
+#### 1.4.0
 * Updating Influx Database with support for writing direct payloads, thanks @virgofx 
 
-###1.3.1
+#### 1.3.1
 * Added ability to write data to a specific retention policy, thanks @virgofx !
 
-###1.3.0
+#### 1.3.0
 * Added quoting of dbname in queries
 * Added orderBy to query builder
 * Fixed wrong orderby tests
 * Travis container-infra and php 7
 
-###1.2.2
+#### 1.2.2
 * Fixed issue with listUsers() method
 * Added more unit tests
 * Added getColumns method to \InfluxDB\ResultSet
 
-###1.2.0
+#### 1.2.0
 * Added support for 32 bit systems
 * Added setters/getters for Point fields
 
-###1.1.3
+#### 1.1.3
 * Added support for symfony3
 
-###1.1.2
+#### 1.1.2
 * Fixed issue with authentication when writing data
 
-###1.1.1
+#### 1.1.1
 * Added support for 0.9.4
 * Added if not exists support to database->create()
 * Added getLastQuery method
 
-###1.1.0
+#### 1.1.0
 * Added support for 0.9.3 rc2
 * Changed the way we handle the datatypes of values
 * Changed list retention policies to reflect the changes in 0.9.3
 
-####1.0.1
+#### 1.0.1
 * Added support for authentication in the guzzle driver
 * Added admin functionality
 
-####1.0.0
+#### 1.0.0
 * -BREAKING CHANGE- Dropped support for PHP 5.3 and PHP 5.4
 * Allowing for custom drivers
 * UDP support
 
-####0.1.2
+#### 0.1.2
 * Added exists method to Database class
 * Added time precision to database class
 
-####0.1.1
+#### 0.1.1
 * Merged repository to influxdb/influxdb-php
 * Added unit test for createRetentionPolicy
 * -BREAKING CHANGE- changed $client->db to $client->selectDB
