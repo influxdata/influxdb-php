@@ -126,9 +126,9 @@ class Point
             if ($tag === '') {
                 $tag = '""';
             } elseif (is_bool($tag)) {
-                $tag = ($tag ? "true" : "false");
+                $tag = ($tag ? 'true' : 'false');
             } elseif (is_null($tag)) {
-                $tag = ("null");
+                $tag = 'null';
             }
         }
         $this->tags = $tags;
@@ -148,14 +148,14 @@ class Point
     public function setFields($fields)
     {
         foreach ($fields as &$field) {
-            if (is_integer($field)) {
+            if (is_int($field)) {
                 $field = sprintf('%di', $field);
             } elseif (is_string($field)) {
                 $field = $this->escapeFieldValue($field);
             } elseif (is_bool($field)) {
-                $field = ($field ? "true" : "false");
+                $field = ($field ? 'true' : 'false');
             } elseif (is_null($field)) {
-                $field = $this->escapeFieldValue("null");
+                $field = $this->escapeFieldValue('null');
             }
         }
 
@@ -249,7 +249,7 @@ class Point
     private function isValidTimeStamp($timestamp)
     {
         // if the code is run on a 32bit system, loosely check if the timestamp is a valid numeric
-        if (PHP_INT_SIZE == 4 && is_numeric($timestamp)) {
+        if (PHP_INT_SIZE === 4 && is_numeric($timestamp)) {
             return true;
         }
 
@@ -257,7 +257,7 @@ class Point
             return false;
         }
 
-        if (intval($timestamp) != $timestamp) {
+        if ((int)$timestamp != $timestamp) {
             return false;
         }
 

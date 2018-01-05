@@ -1,21 +1,16 @@
 <?php
 
-namespace InfluxDB\Test;
+namespace InfluxDB\Test\unit;
 
 use InfluxDB\Client;
 use InfluxDB\Driver\Guzzle;
+use InfluxDB\Exception;
 use InfluxDB\Point;
+use InfluxDB\Database;
+use InfluxDB\ResultSet;
 
 class ClientTest extends AbstractTest
 {
-    /**
-     *
-     */
-    public function setUp()
-    {
-        parent::setUp();
-    }
-
     /** @var Client $client */
     protected $client = null;
 
@@ -24,7 +19,7 @@ class ClientTest extends AbstractTest
         $client = $this->getClient();
 
         $this->assertEquals('http://localhost:8086', $client->getBaseURI());
-        $this->assertInstanceOf('InfluxDB\Driver\Guzzle', $client->getDriver());
+        $this->assertInstanceOf(Guzzle::class, $client->getDriver());
         $this->assertEquals('localhost', $client->getHost());
         $this->assertEquals('0', $client->getTimeout());
         $this->assertFalse($client->getVerifySSL());
@@ -44,7 +39,7 @@ class ClientTest extends AbstractTest
         $dbName = 'test-database';
         $database = $client->selectDB($dbName);
 
-        $this->assertInstanceOf('\InfluxDB\Database', $database);
+        $this->assertInstanceOf(Database::class, $database);
 
         $this->assertEquals($dbName, $database->getName());
     }
@@ -57,14 +52,12 @@ class ClientTest extends AbstractTest
         $this->assertEquals('https', $urlParts['scheme']);
     }
 
-    /**
-     */
     public function testGuzzleQuery()
     {
         $client = $this->getClient('test', 'test');
-        $query = "some-bad-query";
+        $query = 'some-bad-query';
 
-        $bodyResponse = file_get_contents(dirname(__FILE__) . '/json/result.example.json');
+        $bodyResponse = file_get_contents(__DIR__ . '/json/result.example.json');
         $httpMockClient = $this->buildHttpMockClient($bodyResponse);
 
         $guzzle = new Guzzle($httpMockClient);
@@ -77,7 +70,7 @@ class ClientTest extends AbstractTest
 
         $this->assertEquals(['test', 'test'], $parameters['auth']);
         $this->assertEquals('somedb', $parameters['database']);
-        $this->assertInstanceOf('\InfluxDB\ResultSet', $result);
+        $this->assertInstanceOf(ResultSet::class, $result);
 
         $point = new Point('test', 1.0);
 
@@ -105,10 +98,10 @@ class ClientTest extends AbstractTest
             )
         );
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InfluxDB\Exception::class);
         $client->query('test', 'bad-query');
 
-        $this->expectException('\InfluxDB\Driver\Exception');
+        $this->expectException(\InfluxDB\Driver\Exception::class);
         $client->query('test', 'bad-query');
     }
 
@@ -165,7 +158,7 @@ class ClientTest extends AbstractTest
     protected function doTestResponse($responseFile, array $result, $method)
     {
         $client = $this->getClient();
-        $bodyResponse = file_get_contents(dirname(__FILE__) . '/json/'. $responseFile);
+        $bodyResponse = file_get_contents(__DIR__ . '/json/'. $responseFile);
         $httpMockClient = $this->buildHttpMockClient($bodyResponse);
 
         $client->setDriver(new Guzzle($httpMockClient));
