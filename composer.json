@@ -27,17 +27,10 @@
     ],
     "require": {
         "php": "^5.5 || ^7.0",
-        "guzzlehttp/guzzle": "^6.0",
-        "symfony/event-dispatcher": "^2.0 || ^3.0 || ^4.0"
+        "guzzlehttp/guzzle": "^6.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^3.4 || ^4.0",
-        "codeclimate/php-test-reporter": "0.*",
-        "symfony/config": "~2.8|~3.0|~4.0",
-        "symfony/console": "~2.8|~3.0|~4.0",
-        "symfony/filesystem": "~2.8|~3.0|~4.0",
-        "symfony/stopwatch": "~2.8|~3.0|~4.0",
-        "symfony/yaml": "~2.8|~3.0|~4.0"
+        "phpunit/phpunit": "^5.7"
     },
     "autoload": {
         "psr-4": {
@@ -51,5 +44,9 @@
     },
     "suggest": {
         "stefanotorresi/influxdb-php-async": "An asyncronous client for InfluxDB, implemented via ReactPHP."
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-ci": "vendor/bin/phpunit -v --coverage-clover=clover.xml"
     }
 }

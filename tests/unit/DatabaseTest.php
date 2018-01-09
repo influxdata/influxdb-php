@@ -1,6 +1,6 @@
 <?php
 
-namespace InfluxDB\Test;
+namespace InfluxDB\Test\unit;
 
 use InfluxDB\Client;
 use InfluxDB\Database;
@@ -23,13 +23,13 @@ class DatabaseTest extends AbstractTest
     {
         parent::setUp();
 
-        $this->resultData = file_get_contents(dirname(__FILE__) . '/json/result.example.json');
+        $this->resultData = file_get_contents(__DIR__ . '/json/result.example.json');
 
         $this->mockClient->expects($this->any())
             ->method('listDatabases')
             ->will($this->returnValue(array('test123', 'test')));
 
-        $this->dataToInsert = file_get_contents(dirname(__FILE__) . '/json/input.example.json');
+        $this->dataToInsert = file_get_contents(__DIR__ . '/json/input.example.json');
 
     }
 
@@ -39,10 +39,6 @@ class DatabaseTest extends AbstractTest
         $this->assertInstanceOf('InfluxDB\Query\Builder', $this->database->getQueryBuilder());
     }
 
-
-    /**
-     *
-     */
     public function testQueries()
     {
         $testResultSet = new ResultSet($this->resultData);
@@ -52,7 +48,6 @@ class DatabaseTest extends AbstractTest
         $this->assertEquals('DROP DATABASE "influx_test_db"', Client::$lastQuery);
 
     }
-
 
     public function testRetentionPolicyQueries()
     {
@@ -83,7 +78,7 @@ class DatabaseTest extends AbstractTest
 
     /**
      * @group legacy
-     * @expectedDeprecation Unsilenced deprecation: The $createIfNotExists parameter to Database::create is deprecated
+     * @expectedException \PHPUnit_Framework_Error_Deprecated
      */
     public function testIfNotExistsDeprecation()
     {

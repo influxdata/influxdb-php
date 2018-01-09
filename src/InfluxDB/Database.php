@@ -248,7 +248,7 @@ class Database
         );
 
         if ($retentionPolicy->default) {
-            $query .= " DEFAULT";
+            $query .= ' DEFAULT';
         }
 
         return $query;

@@ -1,6 +1,6 @@
 <?php
 
-namespace InfluxDB\Test;
+namespace InfluxDB\Test\unit;
 
 
 use InfluxDB\Point;
@@ -61,7 +61,7 @@ class PointTest extends TestCase
         $this->assertEquals([
             'cpucount' => '10i',
             'free' => '1i',
-            'test' => "\"string\"",
+            'test' => '"string"',
             'bool' => 'false',
             'value' => '1.1100000000000001'
         ], $fields);
@@ -155,7 +155,7 @@ class PointTest extends TestCase
             'instance', // the name of the measurement
             1.11, // measurement value
             ['host' => 'server01', 'region' => 'us-west'],
-            ['cpucount' => 10, 'free' => 1, 'test' => "string", 'bool' => false],
+            ['cpucount' => 10, 'free' => 1, 'test' => 'string', 'bool' => false],
             $timestamp
         );
     }

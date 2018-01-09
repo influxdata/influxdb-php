@@ -25,7 +25,7 @@ class ResultSet
     /**
      * @param string $raw
      * @throws \InvalidArgumentException
-     * @throws Exception
+     * @throws ClientException
      */
     public function __construct($raw)
     {
@@ -59,14 +59,15 @@ class ResultSet
      * @param  array $tags
      * @return array $points
      */
-    public function getPoints($metricName = '', array $tags = array())
+    public function getPoints($metricName = '', array $tags = [])
     {
         $points = [];
         $series = $this->getSeries();
 
+        $emptyArgsProvided = empty($metricName) && empty($tags);
         foreach ($series as $serie) {
-            if ((empty($metricName) && empty($tags)
-                || $serie['name'] == $metricName
+            if (($emptyArgsProvided
+                || $serie['name'] === $metricName
                 || (isset($serie['tags']) && array_intersect($tags, $serie['tags'])))
                 && isset($serie['values'])
             ) {

@@ -3,7 +3,7 @@
  * @author Stephen "TheCodeAssassin" Hoogendijk
  */
 
-namespace InfluxDB\Test;
+namespace InfluxDB\Test\unit;
 
 
 use GuzzleHttp\Handler\MockHandler;
@@ -45,7 +45,7 @@ abstract class AbstractTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->resultData = file_get_contents(dirname(__FILE__) . '/json/result.example.json');
+        $this->resultData = file_get_contents(__DIR__ . '/json/result.example.json');
 
         $this->mockClient->expects($this->any())
             ->method('getBaseURI')
@@ -98,12 +98,12 @@ abstract class AbstractTest extends TestCase
     {
         // Create a mock and queue two responses.
         $mock = new MockHandler([
-            new Response(200, array(), $body),
-            new Response(200, array(), $body),
-            new Response(200, array(), $body),
-            new Response(400, array(), 'fault{'),
-            new Response(400, array(), $body),
-            new Response(400, array(), $body),
+            new Response(200, [], $body),
+            new Response(200, [], $body),
+            new Response(200, [], $body),
+            new Response(400, [], 'fault{'),
+            new Response(400, [], $body),
+            new Response(400, [], $body),
         ]);
 
         $handler = HandlerStack::create($mock);
@@ -125,7 +125,7 @@ abstract class AbstractTest extends TestCase
      */
     public function getClientMock($emptyResult = false)
     {
-        $mockClient = $this->getMockBuilder('\InfluxDB\Client')
+        $mockClient = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -136,20 +136,5 @@ abstract class AbstractTest extends TestCase
         }
 
         return $mockClient;
-    }
-
-    /**
-     * We need this to be compatible with PHPUnit 4.8, 5.x and 6x.
-     * To be removed when we drop support for PHP 5.5.
-     *
-     * @param string $class
-     */
-    public function expectException($class)
-    {
-        if (is_callable('parent::expectException')) {
-            parent::expectException($class);
-        } else {
-            $this->setExpectedException($class);
-        }
     }
 }
