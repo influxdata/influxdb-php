@@ -18,12 +18,18 @@ class ResultSet
     protected $parsedResults = [];
 
     /**
+     * @var string
+     */
+    protected $rawResults = '';
+
+    /**
      * @param string $raw
      * @throws \InvalidArgumentException
-     * @throws Exception
+     * @throws ClientException
      */
     public function __construct($raw)
     {
+        $this->rawResults = $raw;
         $this->parsedResults = json_decode((string) $raw, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -42,22 +48,32 @@ class ResultSet
     }
 
     /**
+     * @return string
+     */
+    public function getRaw() {
+      return $this->rawResults;
+    }
+
+    /**
      * @param  $metricName
      * @param  array $tags
      * @return array $points
      */
-    public function getPoints($metricName = '', array $tags = array())
+    public function getPoints($metricName = '', array $tags = [])
     {
         $points = [];
         $series = $this->getSeries();
 
+        $emptyArgsProvided = empty($metricName) && empty($tags);
         foreach ($series as $serie) {
-            if ((empty($metricName) && empty($tags)
-                || $serie['name'] == $metricName
+            if (($emptyArgsProvided
+                || $serie['name'] === $metricName
                 || (isset($serie['tags']) && array_intersect($tags, $serie['tags'])))
                 && isset($serie['values'])
             ) {
-                $points = array_merge($points, $this->getPointsFromSerie($serie));
+                foreach ($this->getPointsFromSerie($serie) as $point) {
+                    $points[] = $point;
+                }
             }
         }
 

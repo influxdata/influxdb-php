@@ -44,9 +44,14 @@ class Client
     protected $password = '';
 
     /**
-     * @var int
+     * @var float
      */
     protected $timeout = 0;
+
+    /**
+     * @var float
+     */
+    protected $connectTimeout = 0;
 
     /**
      * @var bool
@@ -74,14 +79,9 @@ class Client
     protected $baseURI;
 
     /**
-     * @var \Guzzle\Http\Client
-     */
-    protected $httpClient;
-
-    /**
      * @var array
      */
-    protected $options = array();
+    protected $options = [];
 
     /**
      * @var DriverInterface
@@ -103,7 +103,8 @@ class Client
      * @param string $password
      * @param bool   $ssl
      * @param bool   $verifySSL
-     * @param int    $timeout
+     * @param float  $timeout
+     * @param float  $connectTimeout
      */
     public function __construct(
         $host,
@@ -112,13 +113,15 @@ class Client
         $password = '',
         $ssl = false,
         $verifySSL = false,
-        $timeout = 0
+        $timeout = 0,
+        $connectTimeout = 0
     ) {
         $this->host = (string) $host;
         $this->port = (int) $port;
         $this->username = (string) $username;
         $this->password = (string) $password;
-        $this->timeout = (int) $timeout;
+        $this->timeout = (float) $timeout;
+        $this->connectTimeout = (float) $connectTimeout;
         $this->verifySSL = (bool) $verifySSL;
 
         if ($ssl) {
@@ -129,16 +132,8 @@ class Client
         // the the base URI
         $this->baseURI = sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port);
 
-        // set the default driver to guzzle
-        $this->driver = new Guzzle(
-            new \GuzzleHttp\Client(
-                [
-                    'timeout' => $this->timeout,
-                    'base_uri' => $this->baseURI,
-                    'verify' => $this->verifySSL
-                ]
-            )
-        );
+        // delay driver instantiation until it's actually needed
+        $this->driver = null;
 
         $this->admin = new Admin($this);
     }
@@ -148,6 +143,7 @@ class Client
      *
      * @param  string $name
      * @return Database
+     * @throws \InvalidArgumentException
      */
     public function selectDB($name)
     {
@@ -166,16 +162,15 @@ class Client
      */
     public function query($database, $query, $parameters = [])
     {
+        $driver = $this->getDriver();
 
-        if (!$this->driver instanceof QueryDriverInterface) {
+        if (!$driver instanceof QueryDriverInterface) {
             throw new Exception('The currently configured driver does not support query operations');
         }
 
         if ($database) {
             $parameters['db'] = $database;
         }
-
-        $driver = $this->getDriver();
 
         $parameters = [
             'url' => 'query?' . http_build_query(array_merge(['q' => $query], $parameters)),
@@ -197,7 +192,7 @@ class Client
             // perform the query and return the resultset
             return $driver->query();
 
-        } catch (DriverException $e) {
+        } catch (\Exception $e) {
             throw new Exception('Query has failed', $e->getCode(), $e);
         }
     }
@@ -212,7 +207,7 @@ class Client
      */
     public function write(array $parameters, $payload)
     {
-        // retrive the driver
+        // retrieve the driver
         $driver = $this->getDriver();
 
         // add authentication to the driver if needed
@@ -235,6 +230,7 @@ class Client
 
     /**
      * List all the databases
+     * @throws Exception
      */
     public function listDatabases()
     {
@@ -264,13 +260,14 @@ class Client
      * udp+influxdb://username:pass@localhost:4444/databasename
      *
      * @param  string $dsn
-     * @param  int    $timeout
+     * @param  float  $timeout
      * @param  bool   $verifySSL
+     * @param  float  $connectTimeout
      *
      * @return Client|Database
      * @throws ClientException
      */
-    public static function fromDSN($dsn, $timeout = 0, $verifySSL = false)
+    public static function fromDSN($dsn, $timeout = 0, $verifySSL = false, $connectTimeout = 0)
     {
         $connParams = parse_url($dsn);
         $schemeInfo = explode('+', $connParams['scheme']);
@@ -283,12 +280,12 @@ class Client
             $scheme = $schemeInfo[1];
         }
 
-        if ($scheme != 'influxdb') {
+        if ($scheme !== 'influxdb') {
             throw new ClientException($scheme . ' is not a valid scheme');
         }
 
-        $ssl = $modifier === 'https' ? true : false;
-        $dbName = $connParams['path'] ? substr($connParams['path'], 1) : null;
+        $ssl = $modifier === 'https';
+        $dbName = isset($connParams['path']) ? substr($connParams['path'], 1) : null;
 
         $client = new self(
             $connParams['host'],
@@ -297,11 +294,12 @@ class Client
             isset($connParams['pass']) ? $connParams['pass'] : '',
             $ssl,
             $verifySSL,
-            $timeout
+            $timeout,
+            $connectTimeout
         );
 
         // set the UDP driver when the DSN specifies UDP
-        if ($modifier == 'udp') {
+        if ($modifier === 'udp') {
             $client->setDriver(new UDP($connParams['host'], $connParams['port']));
         }
 
@@ -317,11 +315,27 @@ class Client
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getTimeout()
     {
         return $this->timeout;
+    }
+
+    /**
+     * @return float
+     */
+    public function getConnectTimeout()
+    {
+        return $this->connectTimeout;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getVerifySSL()
+    {
+        return $this->verifySSL;
     }
 
     /**
@@ -337,6 +351,22 @@ class Client
      */
     public function getDriver()
     {
+        if ($this->driver !== null) {
+            return $this->driver;
+        }
+
+        // set the default driver to guzzle
+        $this->driver = new Guzzle(
+            new \GuzzleHttp\Client(
+                [
+                    'connect_timeout' => $this->connectTimeout,
+                    'timeout' => $this->timeout,
+                    'base_uri' => $this->baseURI,
+                    'verify' => $this->verifySSL
+                ]
+            )
+        );
+
         return $this->driver;
     }
 

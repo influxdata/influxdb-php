@@ -1,16 +1,17 @@
 <?php
-namespace InfluxDB\Test;
+namespace InfluxDB\Test\unit;
 
 use InfluxDB\ResultSet;
+use PHPUnit\Framework\TestCase;
 
-class ResultSetTest extends \PHPUnit_Framework_TestCase
+class ResultSetTest extends TestCase
 {
     /** @var ResultSet  $resultSet*/
     protected $resultSet;
 
     public function setUp()
     {
-        $resultJsonExample = file_get_contents(dirname(__FILE__) . '/json/result.example.json');
+        $resultJsonExample = file_get_contents(__DIR__ . '/json/result.example.json');
         $this->resultSet = new ResultSet($resultJsonExample);
     }
 
@@ -65,7 +66,7 @@ EOD;
      */
     public function testGetPointsFromNameWithoudTags()
     {
-        $resultJsonExample = file_get_contents(dirname(__FILE__) . '/json/result-no-tags.example.json');
+        $resultJsonExample = file_get_contents(__DIR__ . '/json/result-no-tags.example.json');
         $this->resultSet = new ResultSet($resultJsonExample);
 
         $measurementName = 'cpu_load_short';
@@ -124,7 +125,7 @@ EOD;
 
     public function testGetPointsFromTags()
     {
-        $tags = array("host" => "server01");
+        $tags = ['host' => 'server01'];
         $expectedNumberOfPoints = 2;
 
         $points = $this->resultSet->getPoints('', $tags);
@@ -135,7 +136,7 @@ EOD;
 
     public function testGetPointsFromNameAndTags()
     {
-        $tags = array("host" => "server01");
+        $tags = ['host' => 'server01'];
         $expectedNumberOfPoints = 2;
 
         $points = $this->resultSet->getPoints('', $tags);

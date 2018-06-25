@@ -1,11 +1,12 @@
 <?php
 
-namespace InfluxDB\Test;
+namespace InfluxDB\Test\unit;
 
 
 use InfluxDB\Point;
+use PHPUnit\Framework\TestCase;
 
-class PointTest extends \PHPUnit_Framework_TestCase
+class PointTest extends TestCase
 {
     public function testPointStringRepresentation()
     {
@@ -60,7 +61,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([
             'cpucount' => '10i',
             'free' => '1i',
-            'test' => "\"string\"",
+            'test' => '"string"',
             'bool' => 'false',
             'value' => '1.1100000000000001'
         ], $fields);
@@ -80,6 +81,32 @@ class PointTest extends \PHPUnit_Framework_TestCase
         $point = $this->getPoint(null);
 
         $point->setFields(['spaces' => 'string with spaces', 'doublequote' => 'the " is escaped']);
+
+        $this->assertEquals($expected, (string) $point);
+    }
+
+    public function testTagBooleanValueEscaping() {
+        $expected = 'instance,bool_tag=false,value_tag=value cpucount=10i,free=1i,test="string",bool=false,value=1.11';
+        $point = $this->getPoint(null);
+
+        $point->setTags(['bool_tag' => false, 'value_tag' => 'value']);
+
+        $this->assertEquals($expected, (string) $point);
+    }
+
+    public function testTagNullValueEscaping() {
+        $expected = 'instance,null_tag=null,value_tag=value cpucount=10i,free=1i,test="string",bool=false,value=1.11';
+        $point = $this->getPoint(null);
+
+        $point->setTags(['null_tag' => null, 'value_tag' => 'value']);
+
+        $this->assertEquals($expected, (string) $point);
+    }
+    public function testTagEmptyValueEscaping() {
+        $expected = 'instance,empty_tag="",whitespace=\ ,value_tag=value cpucount=10i,free=1i,test="string",bool=false,value=1.11';
+        $point = $this->getPoint(null);
+
+        $point->setTags(['empty_tag' => '', 'whitespace' => ' ', 'value_tag' => 'value']);
 
         $this->assertEquals($expected, (string) $point);
     }
@@ -128,7 +155,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
             'instance', // the name of the measurement
             1.11, // measurement value
             ['host' => 'server01', 'region' => 'us-west'],
-            ['cpucount' => 10, 'free' => 1, 'test' => "string", 'bool' => false],
+            ['cpucount' => 10, 'free' => 1, 'test' => 'string', 'bool' => false],
             $timestamp
         );
     }

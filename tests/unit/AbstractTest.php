@@ -3,7 +3,7 @@
  * @author Stephen "TheCodeAssassin" Hoogendijk
  */
 
-namespace InfluxDB\Test;
+namespace InfluxDB\Test\unit;
 
 
 use GuzzleHttp\Handler\MockHandler;
@@ -12,6 +12,7 @@ use InfluxDB\Client;
 use InfluxDB\Database;
 use InfluxDB\Driver\Guzzle as GuzzleDriver;
 use InfluxDB\ResultSet;
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\Response;
@@ -19,7 +20,7 @@ use GuzzleHttp\Psr7\Response;
 /**
  * @property mixed resultData
  */
-abstract class AbstractTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractTest extends TestCase
 {
 
     /** @var  Client|PHPUnit_Framework_MockObject_MockObject $client */
@@ -44,7 +45,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->resultData = file_get_contents(dirname(__FILE__) . '/json/result.example.json');
+        $this->resultData = file_get_contents(__DIR__ . '/json/result.example.json');
 
         $this->mockClient->expects($this->any())
             ->method('getBaseURI')
@@ -97,12 +98,12 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     {
         // Create a mock and queue two responses.
         $mock = new MockHandler([
-            new Response(200, array(), $body),
-            new Response(200, array(), $body),
-            new Response(200, array(), $body),
-            new Response(400, array(), 'fault{'),
-            new Response(400, array(), $body),
-            new Response(400, array(), $body),
+            new Response(200, [], $body),
+            new Response(200, [], $body),
+            new Response(200, [], $body),
+            new Response(400, [], 'fault{'),
+            new Response(400, [], $body),
+            new Response(400, [], $body),
         ]);
 
         $handler = HandlerStack::create($mock);
@@ -124,7 +125,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function getClientMock($emptyResult = false)
     {
-        $mockClient = $this->getMockBuilder('\InfluxDB\Client')
+        $mockClient = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
 

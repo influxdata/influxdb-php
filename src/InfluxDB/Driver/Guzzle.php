@@ -6,7 +6,7 @@
 namespace InfluxDB\Driver;
 
 use GuzzleHttp\Client;
-use Guzzle\Http\Message\Response;
+use GuzzleHttp\Psr7\Response;
 use InfluxDB\ResultSet;
 
 /**
@@ -39,7 +39,6 @@ class Guzzle implements DriverInterface, QueryDriverInterface
      *
      * @param Client $client
      *
-     * @return mixed
      */
     public function __construct(Client $client)
     {
@@ -59,7 +58,6 @@ class Guzzle implements DriverInterface, QueryDriverInterface
      *
      * @param array $parameters
      *
-     * @return mixed
      */
     public function setParameters(array $parameters)
     {
@@ -79,8 +77,7 @@ class Guzzle implements DriverInterface, QueryDriverInterface
      *
      * @param $data
      *
-     * @throws Exception
-     * @return mixed
+     * @throws \Exception
      */
     public function write($data = null)
     {
@@ -88,7 +85,7 @@ class Guzzle implements DriverInterface, QueryDriverInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      * @return ResultSet
      */
     public function query()
@@ -105,12 +102,13 @@ class Guzzle implements DriverInterface, QueryDriverInterface
      * Should return if sending the data was successful
      *
      * @return bool
+     * @throws Exception
      */
     public function isSuccess()
     {
         $statuscode = $this->response->getStatusCode();
 
-        if(!in_array($statuscode, ['200', '204']))
+        if(!in_array($statuscode, [200, 204], true))
         {
             throw new Exception('HTTP Code ' . $statuscode . ' ' . $this->response->getBody());
         }

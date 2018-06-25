@@ -85,17 +85,18 @@ class Admin
      */
     public function showUsers()
     {
-        return $this->client->query(null, "SHOW USERS");
+        return $this->client->query(null, 'SHOW USERS');
     }
 
     /**
      * Grants permissions
      *
-     * @param string          $privilege
-     * @param string          $username
+     * @param string $privilege
+     * @param string $username
      * @param Database|string $database
      *
      * @return \InfluxDB\ResultSet
+     * @throws \InfluxDB\Exception
      */
     public function grant($privilege, $username, $database = null)
     {
@@ -129,11 +130,11 @@ class Admin
     private function executePrivilege($type, $privilege, $username, $database = null)
     {
 
-        if (!in_array($privilege, [self::PRIVILEGE_READ, self::PRIVILEGE_WRITE, self::PRIVILEGE_ALL])) {
+        if (!in_array($privilege, [self::PRIVILEGE_READ, self::PRIVILEGE_WRITE, self::PRIVILEGE_ALL], true)) {
             throw new Exception($privilege . ' is not a valid privileges, allowed privileges: READ, WRITE, ALL');
         }
 
-        if ($privilege != self::PRIVILEGE_ALL && !$database) {
+        if ($privilege !== self::PRIVILEGE_ALL && !$database) {
             throw new Exception('Only grant ALL cluster-wide privileges are allowed');
         }
 
@@ -144,12 +145,12 @@ class Admin
         if ($database) {
             $query .= sprintf(' ON %s ', $database);
         } else {
-            $query .= " PRIVILEGES ";
+            $query .= ' PRIVILEGES ';
         }
 
-        if ($username && $type == 'GRANT') {
+        if ($username && $type === 'GRANT') {
             $query .= "TO $username";
-        } elseif ($username && $type == 'REVOKE') {
+        } elseif ($username && $type === 'REVOKE') {
             $query .= "FROM $username";
         }
 
