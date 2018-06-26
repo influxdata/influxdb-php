@@ -66,6 +66,11 @@ class Builder
     protected $limitClause = '';
 
     /**
+     * @var string
+     */
+    protected $offsetClause = '';
+
+    /**
      * @var array
      */
     protected $groupBy;
@@ -249,6 +254,20 @@ class Builder
     }
 
     /**
+     * Offset the ResultSet to n records
+     *
+     * @param int $count
+     *
+     * @return $this
+     */
+    public function offset($count)
+    {
+        $this->offsetClause = sprintf(' OFFSET %s', (int) $count);
+
+        return $this;
+    }
+
+    /**
      * Add retention policy to query
      *
      * @param string $rp
@@ -320,6 +339,10 @@ class Builder
 
         if ($this->limitClause) {
             $query .= $this->limitClause;
+        }
+
+        if ($this->offsetClause) {
+            $query .= $this->offsetClause;
         }
 
         return $query;
