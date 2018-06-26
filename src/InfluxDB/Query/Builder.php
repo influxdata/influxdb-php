@@ -66,6 +66,11 @@ class Builder
     protected $limitClause = '';
 
     /**
+     * @var string
+     */
+    protected $fillClause = '';
+
+    /**
      * @var array
      */
     protected $groupBy;
@@ -206,7 +211,16 @@ class Builder
     }
 
     /**
-     * Set's the time range to select data from
+     * @param int $value
+     * @return $this
+     */
+    public function fill($value = 0) {
+        $this->fillClause = sprintf(' fill(%s)', (int)$value);
+        return $this;
+    }
+
+    /**
+     * Sets the time range to select data from
      *
      * @param  int $from
      * @param  int $to
@@ -320,6 +334,10 @@ class Builder
 
         if ($this->limitClause) {
             $query .= $this->limitClause;
+        }
+
+        if($this->fillClause) {
+            $query .= $this->fillClause;
         }
 
         return $query;
