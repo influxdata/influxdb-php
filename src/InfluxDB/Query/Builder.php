@@ -7,24 +7,17 @@ use InfluxDB\ResultSet;
 
 /**
  * Class Builder
- *
  * Abstraction class for getting time series out of InfluxDB
- *
  * Sample usage:
- *
  * $series = new QueryBuilder($db);
  * $series->percentile(95)->setTimeRange($timeFrom, $timeTo)->getResult();
- *
  * $series->select('*')->from('*')->getResult();
- *
- * @todo add inner join
- * @todo add merge
- *
+ * @todo    add inner join
+ * @todo    add merge
  * @package InfluxDB\Query
- * @author Stephen "TheCodeAssassin" Hoogendijk <s.hoogendijk@tech.leaseweb.com>
+ * @author  Stephen "TheCodeAssassin" Hoogendijk <s.hoogendijk@tech.leaseweb.com>
  */
-class Builder
-{
+class Builder {
     /**
      * @var Database
      */
@@ -83,17 +76,16 @@ class Builder
     /**
      * @param Database $db
      */
-    public function __construct(Database $db)
-    {
+    public function __construct(Database $db) {
         $this->db = $db;
     }
 
     /**
      * @param  string $metric The metric to select (required)
+     *
      * @return $this
      */
-    public function from($metric)
-    {
+    public function from($metric) {
         $this->metric = $metric;
 
         return $this;
@@ -101,16 +93,14 @@ class Builder
 
     /**
      * Custom select method
-     *
      * example:
-     *
      * $series->select('sum(value)',
      *
      * @param  string $customSelect
+     *
      * @return $this
      */
-    public function select($customSelect)
-    {
+    public function select($customSelect) {
         $this->selection = $customSelect;
 
         return $this;
@@ -118,14 +108,12 @@ class Builder
 
     /**
      * @param array $conditions
-     *
      * Example: array('time > now()', 'time < now() -1d');
      *
      * @return $this
      */
-    public function where(array $conditions)
-    {
-        foreach ($conditions as $condition) {
+    public function where(array $conditions) {
+        foreach($conditions as $condition) {
             $this->where[] = $condition;
         }
 
@@ -134,10 +122,10 @@ class Builder
 
     /**
      * @param  string $field
+     *
      * @return $this
      */
-    public function count($field = 'type')
-    {
+    public function count($field = 'type') {
         $this->selection = sprintf('count(%s)', $field);
 
         return $this;
@@ -145,10 +133,10 @@ class Builder
 
     /**
      * @param  string $field
+     *
      * @return $this
      */
-    public function median($field = 'type')
-    {
+    public function median($field = 'type') {
         $this->selection = sprintf('median(%s)', $field);
 
         return $this;
@@ -156,10 +144,10 @@ class Builder
 
     /**
      * @param  string $field
+     *
      * @return $this
      */
-    public function mean($field = 'type')
-    {
+    public function mean($field = 'type') {
         $this->selection = sprintf('mean(%s)', $field);
 
         return $this;
@@ -167,10 +155,10 @@ class Builder
 
     /**
      * @param  string $field
+     *
      * @return $this
      */
-    public function sum($field = 'type')
-    {
+    public function sum($field = 'type') {
         $this->selection = sprintf('sum(%s)', $field);
 
         return $this;
@@ -178,10 +166,10 @@ class Builder
 
     /**
      * @param  string $field
+     *
      * @return $this
      */
-    public function first($field = 'type')
-    {
+    public function first($field = 'type') {
         $this->selection = sprintf('first(%s)', $field);
 
         return $this;
@@ -189,10 +177,10 @@ class Builder
 
     /**
      * @param  string $field
+     *
      * @return $this
      */
-    public function last($field = 'type')
-    {
+    public function last($field = 'type') {
         $this->selection = sprintf('last(%s)', $field);
 
         return $this;
@@ -211,11 +199,35 @@ class Builder
     }
 
     /**
-     * @param int $value
+     * @param string|null|int|float $value
+     *
      * @return $this
      */
-    public function fill($value = 0) {
-        $this->fillClause = sprintf(' fill(%s)', (int)$value);
+    public function fill($value) {
+
+        if (is_null($value)) {
+            $this->fillClause = ' fill(null)';
+
+        } else if (is_numeric($value)) {
+            $this->fillClause = " fill('$value')";
+
+        } else if (is_string($value)) {
+            switch($value) {
+                case 'linear':
+                case 'none':
+                case 'previous':
+                case 'null':
+                    $this->fillClause = sprintf(" fill(%s)", $value);
+                    break;
+                default:
+                    throw new \InvalidArgumentException("fill() invalid string argument: '$value'");
+            }
+
+        } else {
+            throw new \InvalidArgumentException("fill() invalid argument type: '$value'");
+
+        }
+
         return $this;
     }
 
@@ -224,12 +236,12 @@ class Builder
      *
      * @param  int $from
      * @param  int $to
+     *
      * @return $this
      */
-    public function setTimeRange($from, $to)
-    {
-        $fromDate = date('Y-m-d H:i:s', (int) $from);
-        $toDate = date('Y-m-d H:i:s', (int) $to);
+    public function setTimeRange($from, $to) {
+        $fromDate = date('Y-m-d H:i:s', (int)$from);
+        $toDate = date('Y-m-d H:i:s', (int)$to);
 
         $this->where(array("time > '$fromDate'", "time < '$toDate'"));
 
@@ -241,9 +253,8 @@ class Builder
      *
      * @return $this
      */
-    public function percentile($percentile = 95)
-    {
-        $this->selection = sprintf('percentile(value, %d)', (int) $percentile);
+    public function percentile($percentile = 95) {
+        $this->selection = sprintf('percentile(value, %d)', (int)$percentile);
 
         return $this;
     }
@@ -255,9 +266,8 @@ class Builder
      *
      * @return $this
      */
-    public function limit($count)
-    {
-        $this->limitClause = sprintf(' LIMIT %s', (int) $count);
+    public function limit($count) {
+        $this->limitClause = sprintf(' LIMIT %s', (int)$count);
 
         return $this;
     }
@@ -269,9 +279,8 @@ class Builder
      *
      * @return $this
      */
-    public function retentionPolicy($rp)
-    {
-        $this->retentionPolicy =  $rp;
+    public function retentionPolicy($rp) {
+        $this->retentionPolicy = $rp;
 
         return $this;
     }
@@ -279,27 +288,23 @@ class Builder
     /**
      * @return string
      */
-    public function getQuery()
-    {
+    public function getQuery() {
         return $this->parseQuery();
     }
 
     /**
      * Gets the result from the database (builds the query)
-     *
      * @return ResultSet
      * @throws \Exception
      */
-    public function getResultSet()
-    {
-        return  $this->db->query($this->parseQuery());
+    public function getResultSet() {
+        return $this->db->query($this->parseQuery());
     }
 
     /**
      * @return string
      */
-    protected function parseQuery()
-    {
+    protected function parseQuery() {
         $rp = '';
 
         if (is_string($this->retentionPolicy) && !empty($this->retentionPolicy)) {
@@ -308,11 +313,11 @@ class Builder
 
         $query = sprintf('SELECT %s FROM %s"%s"', $this->selection, $rp, $this->metric);
 
-        if (! $this->metric) {
+        if (!$this->metric) {
             throw new \InvalidArgumentException('No metric provided to from()');
         }
 
-        for ($i = 0, $iMax = count($this->where); $i < $iMax; $i++) {
+        for($i = 0, $iMax = count($this->where);$i < $iMax;$i++) {
             $selection = 'WHERE';
 
             if ($i > 0) {
@@ -336,7 +341,7 @@ class Builder
             $query .= $this->limitClause;
         }
 
-        if($this->fillClause) {
+        if ($this->fillClause) {
             $query .= $this->fillClause;
         }
 
