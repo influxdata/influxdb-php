@@ -335,8 +335,13 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
-#### 1.14.6
+#### 1.14.7
 - Added offset in QueryBuilder (thanks @lifekent and @BentCoder)
+
+#### 1.14.6
+- dependencies update (#97), by @aldas
+- Adding timeout information. (#103), by @NickBusey
+- Add ability to specify connect_timeout for guzzle (#105), by @brycefranzen
 
 #### 1.14.5
 - Update key concepts link to point to the proper place.
