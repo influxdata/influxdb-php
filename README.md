@@ -67,6 +67,7 @@ $result = $database->getQueryBuilder()
 	->select('cpucount')
 	->from('test_metric')
 	->limit(2)
+	->offset(2)
 	->getResultSet()
 	->getPoints();
 
