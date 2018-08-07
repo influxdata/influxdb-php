@@ -44,6 +44,9 @@ $database = InfluxDB\Client::fromDSN(sprintf('influxdb://user:pass@%s:%s/%s', $h
 $client = $database->getClient();
 ```
 
+**Important:** don't forget to `urlencode()` the password (and username for that matter) when using a DSN,
+especially if it contains non-alphanumeric characters. Not doing so might cause exceptions to be thrown.
+  
 ### Reading data
 
 To fetch records from InfluxDB you can do a query directly on a database:
