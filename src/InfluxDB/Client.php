@@ -270,6 +270,11 @@ class Client
     public static function fromDSN($dsn, $timeout = 0, $verifySSL = false, $connectTimeout = 0)
     {
         $connParams = parse_url($dsn);
+
+        if ($connParams === false) {
+            throw new ClientException('Unable to parse the InfluxDB DSN');
+        }
+
         $schemeInfo = explode('+', $connParams['scheme']);
         $dbName = null;
         $modifier = null;
@@ -290,8 +295,8 @@ class Client
         $client = new self(
             $connParams['host'],
             $connParams['port'],
-            isset($connParams['user']) ? $connParams['user'] : '',
-            isset($connParams['pass']) ? $connParams['pass'] : '',
+            isset($connParams['user']) ? urldecode($connParams['user']) : '',
+            isset($connParams['pass']) ? urldecode($connParams['pass']) : '',
             $ssl,
             $verifySSL,
             $timeout,
