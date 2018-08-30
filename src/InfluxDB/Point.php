@@ -32,6 +32,11 @@ class Point
     protected $timestamp;
 
     /**
+     * @var string
+     */
+    private $decimalSeparatorCharacter = '.';
+
+    /**
      * The timestamp is optional. If you do not specify a timestamp the server’s
      * local timestamp will be used
      *
@@ -53,6 +58,8 @@ class Point
             throw new DatabaseException('Invalid measurement name provided');
         }
 
+        $this->detectDecimalSeparator();
+
         $this->measurement = (string) $measurement;
         $this->setTags($tags);
         $fields = $additionalFields;
@@ -68,6 +75,20 @@ class Point
         }
 
         $this->timestamp = $timestamp;
+    }
+
+    /**
+     * Detect decimal separator character for numbers. This is needed as some locales do not use '.' as decimal separator and
+     * we can not send query to InfluxDb with incorrect decimal separator
+     *
+     * For example some countries use comma instead of point -> https://en.wikipedia.org/wiki/Decimal_mark#Countries_using_Arabic_numerals_with_decimal_comma
+     */
+    private function detectDecimalSeparator()
+    {
+        $localeInfo = localeconv();
+        if ($localeInfo['decimal_point'] !== '.') {
+            $this->decimalSeparatorCharacter = $localeInfo['decimal_point'];
+        }
     }
 
     /**
@@ -152,6 +173,11 @@ class Point
                 $field = sprintf('%di', $field);
             } elseif (is_string($field)) {
                 $field = $this->escapeFieldValue($field);
+            } elseif (is_float($field)) {
+                $field = (string)$field;
+                if($this->decimalSeparatorCharacter !== '.') {
+                    $field = str_replace($this->decimalSeparatorCharacter, '.', $field);
+                }
             } elseif (is_bool($field)) {
                 $field = ($field ? 'true' : 'false');
             } elseif (is_null($field)) {

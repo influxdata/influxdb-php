@@ -47,18 +47,15 @@ EOD;
      */
     public function testThrowsInfluxDBExceptionIfAnyErrorInSeries()
     {
+        new ResultSet(file_get_contents(__DIR__ . '/json/result-error.example.json'));
+    }
 
-        $errorResult = <<<EOD
-{
-    "results": [
-        {
-            "series": [],
-            "error": "There was an error after querying"
-        }
-    ]
-}
-EOD;
-        new ResultSet($errorResult);
+    public function testGetRaw()
+    {
+        $resultJsonExample = file_get_contents(__DIR__ . '/json/result.example.json');
+        $resultSet = new ResultSet($resultJsonExample);
+
+        $this->assertEquals($resultJsonExample, $resultSet->getRaw());
     }
 
     /**
@@ -143,5 +140,69 @@ EOD;
 
         $this->assertTrue(is_array($points));
         $this->assertCount($expectedNumberOfPoints, $points);
+    }
+
+    public function testGetDefaultResultFromMultiStatementQuery()
+    {
+        $resultSet = new ResultSet(file_get_contents(__DIR__ . '/json/result-multi-query.example.json'));
+
+        $series = $resultSet->getSeries();
+
+        $this->assertTrue(is_array($series));
+        $this->assertCount(1, $series);
+        $this->assertEquals('cpu_load_short', $series[0]['name']);
+    }
+
+    public function testGetNthResultFromMultiStatementQuery()
+    {
+        $resultSet = new ResultSet(file_get_contents(__DIR__ . '/json/result-multi-query.example.json'));
+
+        $series = $resultSet->getSeries(1);
+
+        $this->assertTrue(is_array($series));
+        $this->assertCount(1, $series);
+        $this->assertEquals('cpu_load_long', $series[0]['name']);
+    }
+
+    public function testGetAllResultsFromMultiStatementQuery()
+    {
+        $resultSet = new ResultSet(file_get_contents(__DIR__ . '/json/result-multi-query.example.json'));
+
+        $series = $resultSet->getSeries(null);
+
+        $this->assertTrue(is_array($series));
+        $this->assertCount(2, $series);
+        $this->assertEquals('cpu_load_short', $series[0][0]['name']);
+        $this->assertEquals('cpu_load_long', $series[1][0]['name']);
+    }
+
+    /**
+     * Throws Exception if invalid query index is given
+     *
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid statement index provided
+     */
+    public function testGetInvalidResultFromMultiStatementQuery()
+    {
+        $resultSet = new ResultSet(file_get_contents(__DIR__ . '/json/result-multi-query.example.json'));
+
+        $resultSet->getSeries(2);
+    }
+
+    /**
+     * Throws Exception if Nth query resulted an error
+     *
+     * @expectedException \InfluxDB\Client\Exception
+     * @expectedExceptionMessage should trigger error
+     */
+    public function testGetErrorFromMultiStatementQuery()
+    {
+        $raw = json_decode(file_get_contents(__DIR__ . '/json/result-multi-query.example.json'), true);
+        unset($raw['results'][1]['series']);
+        $raw['results'][1]['error'] = 'should trigger error';
+
+        $resultSet = new ResultSet(json_encode($raw));
+
+        $resultSet->getSeries(1);
     }
 }

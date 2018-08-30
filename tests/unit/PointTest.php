@@ -29,6 +29,20 @@ class PointTest extends TestCase
     }
 
     /**
+     * Check if the Point class throw an exception when invalid measurement name is given.
+     *
+     * @expectedException \InfluxDB\Database\Exception
+     * @expectedExceptionMessage Invalid measurement name provided
+     */
+    public function testMeasurementNameCanNotBeEmpty()
+    {
+        new Point(
+            '', // the name of the measurement
+            1.11
+        );
+    }
+
+    /**
      * Check if the Point class accept all valid timestamp given.
      *
      * @dataProvider validTimestampProvider
@@ -73,6 +87,27 @@ class PointTest extends TestCase
         $point->setTags(['test' => 'value']);
         $this->assertEquals(['test' => 'value'], $point->getTags());
 
+    }
+
+    public function testFieldValueFloatDefaultLocaleConversion()
+    {
+        $currentLocale = setlocale(LC_NUMERIC, 0);
+        try {
+            setlocale(LC_NUMERIC, 'C');
+            $point = $this->getPoint(null);
+
+            $this->assertEquals('1.11', $point->getFields()['value']);
+        } finally {
+            // restore locale as it was
+            setlocale(LC_NUMERIC, $currentLocale);
+        }
+    }
+
+    public function testFieldValueNullEscaping()
+    {
+        $point = $this->getPoint(null);
+        $point->setFields(['nullfield' => null]);
+        $this->assertEquals('"null"', $point->getFields()['nullfield']);
     }
 
     public function testFieldValueStringEscaping()
