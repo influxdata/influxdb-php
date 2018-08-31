@@ -94,8 +94,17 @@ class Guzzle implements DriverInterface, QueryDriverInterface
 
         $raw = (string) $response->getBody();
 
-        return new ResultSet($raw);
+        return $this->asResultSet($raw);
+    }
 
+    /**
+     * @param $raw
+     * @return ResultSet
+     * @throws \InfluxDB\Client\Exception
+     */
+    protected function asResultSet($raw)
+    {
+        return new ResultSet($raw);
     }
 
     /**

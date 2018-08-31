@@ -30,12 +30,20 @@ class ResultSet
     public function __construct($raw)
     {
         $this->rawResults = $raw;
-        $this->parsedResults = json_decode((string) $raw, true);
+        $this->parsedResults = json_decode((string)$raw, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \InvalidArgumentException('Invalid JSON');
         }
 
+        $this->validate();
+    }
+
+    /**
+     * @throws ClientException
+     */
+    protected function validate()
+    {
         // There was an error in the query thrown by influxdb
         if (isset($this->parsedResults['error'])) {
             throw new ClientException($this->parsedResults['error']);
