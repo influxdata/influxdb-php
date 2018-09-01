@@ -76,8 +76,8 @@ class ResultSet
         $emptyArgsProvided = empty($metricName) && empty($tags);
         foreach ($series as $serie) {
             if (($emptyArgsProvided
-                    || $serie['name'] === $metricName
-                    || (isset($serie['tags']) && array_intersect($tags, $serie['tags'])))
+                || $serie['name'] === $metricName
+                || (isset($serie['tags']) && array_intersect($tags, $serie['tags'])))
                 && isset($serie['values'])
             ) {
                 foreach ($this->getPointsFromSerie($serie) as $point) {

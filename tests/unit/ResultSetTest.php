@@ -156,9 +156,7 @@ EOD;
 
     public function testGetDefaultResultFromMultiStatementQuery()
     {
-        $resultSet = new ResultSet(file_get_contents(__DIR__ . '/json/result-multi-query.example.json'));
-
-        $series = $resultSet->getSeries();
+        $series = $this->multiQueryResultSet->getSeries();
 
         $this->assertTrue(is_array($series));
         $this->assertCount(1, $series);
@@ -167,9 +165,7 @@ EOD;
 
     public function testGetNthResultFromMultiStatementQuery()
     {
-        $resultSet = new ResultSet(file_get_contents(__DIR__ . '/json/result-multi-query.example.json'));
-
-        $series = $resultSet->getSeries(1);
+        $series = $this->multiQueryResultSet->getSeries(1);
 
         $this->assertTrue(is_array($series));
         $this->assertCount(1, $series);
@@ -178,9 +174,7 @@ EOD;
 
     public function testGetAllResultsFromMultiStatementQuery()
     {
-        $resultSet = new ResultSet(file_get_contents(__DIR__ . '/json/result-multi-query.example.json'));
-
-        $series = $resultSet->getSeries(null);
+        $series = $this->multiQueryResultSet->getSeries(null);
 
         $this->assertTrue(is_array($series));
         $this->assertCount(2, $series);
@@ -196,9 +190,7 @@ EOD;
      */
     public function testGetInvalidResultFromMultiStatementQuery()
     {
-        $resultSet = new ResultSet(file_get_contents(__DIR__ . '/json/result-multi-query.example.json'));
-
-        $resultSet->getSeries(2);
+        $this->multiQueryResultSet->getSeries(2);
     }
 
     /**
