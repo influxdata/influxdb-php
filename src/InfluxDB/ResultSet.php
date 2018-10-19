@@ -121,8 +121,14 @@ class ResultSet
     {
         $points = [];
 
-        foreach ($serie['values'] as $point) {
-            $points[] = array_combine($serie['columns'], $point);
+        foreach ($serie['values'] as $value) {
+            $point = array_combine($serie['columns'], $value);
+
+            if (isset($serie['tags'])) {
+                $point += $serie['tags'];
+            }
+
+            $points[] = $point;
         }
 
         return $points;
