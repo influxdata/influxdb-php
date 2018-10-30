@@ -85,6 +85,8 @@ class PlainPhpHttp implements DriverInterface, QueryDriverInterface {
             ]
         ];
 
+        $opts = $this->setupAuthHeader($opts);
+
         $context = stream_context_create($opts);
 
         $result = file_get_contents($full_url, false, $context);
@@ -97,7 +99,18 @@ class PlainPhpHttp implements DriverInterface, QueryDriverInterface {
      */
     public function query() {
         $full_url = $this->baseUri . '/' . $this->parameters['url'];
-        $result = file_get_contents($full_url);
+
+        $opts = [
+            'http' => [
+                'method' => 'GET',
+            ]
+        ];
+
+        $opts = $this->setupAuthHeader($opts);
+
+        $context = stream_context_create($opts);
+
+        $result = file_get_contents($full_url, false, $context);
 
         return new ResultSet($result);
     }
@@ -135,5 +148,14 @@ class PlainPhpHttp implements DriverInterface, QueryDriverInterface {
         }
 
         return $requestParameters;
+    }
+
+    protected function setupAuthHeader($opts) {
+        if( isset($this->parameters['auth']) ) {
+            $auth_hash = base64_encode(implode(':', $this->parameters['auth']));
+            $opts['http']['header'] = 'Authorization: Basic ' . $auth_hash;
+        }
+
+        return $opts;
     }
 }
