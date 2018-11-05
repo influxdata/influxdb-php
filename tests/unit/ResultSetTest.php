@@ -1,4 +1,5 @@
 <?php
+
 namespace InfluxDB\Test\unit;
 
 use InfluxDB\ResultSet;
@@ -6,13 +7,17 @@ use PHPUnit\Framework\TestCase;
 
 class ResultSetTest extends TestCase
 {
-    /** @var ResultSet  $resultSet*/
+    /** @var ResultSet $resultSet */
     protected $resultSet;
+
+    /** @var ResultSet $resultSet */
+    protected $multiQueryResultSet;
 
     public function setUp()
     {
         $resultJsonExample = file_get_contents(__DIR__ . '/json/result.example.json');
         $this->resultSet = new ResultSet($resultJsonExample);
+        $this->multiQueryResultSet = new ResultSet(file_get_contents(__DIR__ . '/json/result-multi-query.example.json'));
     }
 
     /**
@@ -47,18 +52,15 @@ EOD;
      */
     public function testThrowsInfluxDBExceptionIfAnyErrorInSeries()
     {
+        new ResultSet(file_get_contents(__DIR__ . '/json/result-error.example.json'));
+    }
 
-        $errorResult = <<<EOD
-{
-    "results": [
-        {
-            "series": [],
-            "error": "There was an error after querying"
-        }
-    ]
-}
-EOD;
-        new ResultSet($errorResult);
+    public function testGetRaw()
+    {
+        $resultJsonExample = file_get_contents(__DIR__ . '/json/result.example.json');
+        $resultSet = new ResultSet($resultJsonExample);
+
+        $this->assertEquals($resultJsonExample, $resultSet->getRaw());
     }
 
     /**
@@ -99,6 +101,13 @@ EOD;
     public function testGetSeries()
     {
         $this->assertEquals(['time', 'value'], $this->resultSet->getColumns());
+    }
+
+    public function testGetSeriesFromMultiQuery()
+    {
+        $this->assertEquals(['time', 'value'], $this->multiQueryResultSet->getColumns(0));
+        $this->assertEquals(['time', 'value'], $this->multiQueryResultSet->getColumns(null));
+        $this->assertEquals(['time', 'count'], $this->multiQueryResultSet->getColumns(1));
     }
 
     /**
@@ -143,5 +152,61 @@ EOD;
 
         $this->assertTrue(is_array($points));
         $this->assertCount($expectedNumberOfPoints, $points);
+    }
+
+    public function testGetDefaultResultFromMultiStatementQuery()
+    {
+        $series = $this->multiQueryResultSet->getSeries();
+
+        $this->assertTrue(is_array($series));
+        $this->assertCount(1, $series);
+        $this->assertEquals('cpu_load_short', $series[0]['name']);
+    }
+
+    public function testGetNthResultFromMultiStatementQuery()
+    {
+        $series = $this->multiQueryResultSet->getSeries(1);
+
+        $this->assertTrue(is_array($series));
+        $this->assertCount(1, $series);
+        $this->assertEquals('cpu_load_long', $series[0]['name']);
+    }
+
+    public function testGetAllResultsFromMultiStatementQuery()
+    {
+        $series = $this->multiQueryResultSet->getSeries(null);
+
+        $this->assertTrue(is_array($series));
+        $this->assertCount(2, $series);
+        $this->assertEquals('cpu_load_short', $series[0][0]['name']);
+        $this->assertEquals('cpu_load_long', $series[1][0]['name']);
+    }
+
+    /**
+     * Throws Exception if invalid query index is given
+     *
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid statement index provided
+     */
+    public function testGetInvalidResultFromMultiStatementQuery()
+    {
+        $this->multiQueryResultSet->getSeries(2);
+    }
+
+    /**
+     * Throws Exception if Nth query resulted an error
+     *
+     * @expectedException \InfluxDB\Client\Exception
+     * @expectedExceptionMessage should trigger error
+     */
+    public function testGetErrorFromMultiStatementQuery()
+    {
+        $raw = json_decode(file_get_contents(__DIR__ . '/json/result-multi-query.example.json'), true);
+        unset($raw['results'][1]['series']);
+        $raw['results'][1]['error'] = 'should trigger error';
+
+        $resultSet = new ResultSet(json_encode($raw));
+
+        $resultSet->getSeries(1);
     }
 }

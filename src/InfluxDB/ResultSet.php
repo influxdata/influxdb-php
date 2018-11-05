@@ -30,12 +30,20 @@ class ResultSet
     public function __construct($raw)
     {
         $this->rawResults = $raw;
-        $this->parsedResults = json_decode((string) $raw, true);
+        $this->parsedResults = json_decode((string)$raw, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \InvalidArgumentException('Invalid JSON');
         }
 
+        $this->validate();
+    }
+
+    /**
+     * @throws ClientException
+     */
+    protected function validate()
+    {
         // There was an error in the query thrown by influxdb
         if (isset($this->parsedResults['error'])) {
             throw new ClientException($this->parsedResults['error']);
@@ -50,8 +58,9 @@ class ResultSet
     /**
      * @return string
      */
-    public function getRaw() {
-      return $this->rawResults;
+    public function getRaw()
+    {
+        return $this->rawResults;
     }
 
     /**
@@ -86,31 +95,60 @@ class ResultSet
      * results is an array of objects, one for each query,
      * each containing the keys for a series
      *
-     * @throws Exception
+     * @param int $queryIndex which Nth query result to return. Use null as value if you want all result of multi query results
      * @return array $series
+     * @throws ClientException
      */
-    public function getSeries()
+    public function getSeries($queryIndex = 0)
     {
-        $series = array_map(
-            function ($object) {
-                if (isset($object['error'])) {
-                    throw new ClientException($object['error']);
-                }
+        $results = $this->parsedResults['results'];
 
-                return isset($object['series']) ? $object['series'] : [];
-            },
-            $this->parsedResults['results']
-        );
+        if ($queryIndex !== null && !array_key_exists($queryIndex, $results)) {
+            throw new \InvalidArgumentException('Invalid statement index provided');
+        }
 
-        return array_shift($series);
+        $queryResults = [];
+        foreach ($results as $index => $query) {
+            /**
+             * 'statement_id' was introduced in 1.2+ version so for backwards compatibility use array index for query index
+             * See difference:
+             *  1.2 -> https://docs.influxdata.com/influxdb/v1.2/guides/querying_data/
+             *  1.1 -> https://docs.influxdata.com/influxdb/v1.1/guides/querying_data/
+             */
+            $statementId = isset($query['statement_id']) ? $query['statement_id'] : $index;
+
+            if ($queryIndex === $statementId) {
+                return $this->extractQuery($query);
+            }
+
+            if ($queryIndex === null) {
+                $queryResults[$statementId] = $this->extractQuery($query);
+            }
+        }
+
+        return $queryResults;
+    }
+
+    private function extractQuery($statementSeries)
+    {
+        if (isset($statementSeries['error'])) {
+            throw new ClientException($statementSeries['error']);
+        }
+
+        return isset($statementSeries['series']) ? $statementSeries['series'] : [];
     }
 
     /**
+     * @param int $queryIndex which Nth query result to return. Defaults to first query.
      * @return mixed
+     * @throws ClientException
      */
-    public function getColumns()
+    public function getColumns($queryIndex = 0)
     {
-        return $this->getSeries()[0]['columns'];
+        if ($queryIndex === null) {
+            $queryIndex = 0;
+        }
+        return $this->getSeries($queryIndex)[0]['columns'];
     }
 
     /**
