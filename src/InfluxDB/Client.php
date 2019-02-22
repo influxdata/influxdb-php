@@ -8,6 +8,7 @@ use InfluxDB\Driver\DriverInterface;
 use InfluxDB\Driver\Exception as DriverException;
 use InfluxDB\Driver\Guzzle;
 use InfluxDB\Driver\QueryDriverInterface;
+use InfluxDB\Driver\TCP;
 use InfluxDB\Driver\UDP;
 
 /**
@@ -258,6 +259,7 @@ class Client
      *
      * https+influxdb://username:pass@localhost:8086/databasename
      * udp+influxdb://username:pass@localhost:4444/databasename
+     * tcp+influxdb://username:pass@localhost:8094/databasename
      *
      * @param  string $dsn
      * @param  float  $timeout
@@ -303,9 +305,12 @@ class Client
             $connectTimeout
         );
 
-        // set the UDP driver when the DSN specifies UDP
         if ($modifier === 'udp') {
+            // set the UDP driver when the DSN specifies UDP
             $client->setDriver(new UDP($connParams['host'], $connParams['port']));
+        } elseif ($modifier === 'tcp') {
+            // set the TCP driver when the DSN specifies TCP
+            $client->setDriver(new TCP($connParams['host'], $connParams['port']));
         }
 
         return ($dbName ? $client->selectDB($dbName) : $client);
