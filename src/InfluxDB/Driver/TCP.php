@@ -39,6 +39,6 @@ class TCP extends AbstractSocketDriver implements DriverInterface
      */
     protected function doWrite($data = null)
     {
-        $this->result = false !== fwrite($this->stream, $data);
+        $this->result = false !== @fwrite($this->stream, $data);
     }
 }
