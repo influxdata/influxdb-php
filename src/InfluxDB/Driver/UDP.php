@@ -34,7 +34,7 @@ class UDP extends AbstractSocketDriver implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    protected function doWrite($data = null)
+    protected function doWrite($data)
     {
         @stream_socket_sendto($this->stream, $data);
     }

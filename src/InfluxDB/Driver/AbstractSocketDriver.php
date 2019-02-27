@@ -75,7 +75,9 @@ abstract class AbstractSocketDriver implements DriverInterface
             $this->createStream();
         }
 
-        $this->doWrite($data);
+        if ($data !== null) {
+            $this->doWrite($data);
+        }
     }
 
     /**
@@ -85,9 +87,9 @@ abstract class AbstractSocketDriver implements DriverInterface
 
     /**
      * Perform write to socket
-     * @param mixed|null $data
+     * @param mixed $data
      */
-    abstract protected function doWrite($data = null);
+    abstract protected function doWrite($data);
 
     /**
      * Create the resource stream
