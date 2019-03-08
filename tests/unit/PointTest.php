@@ -96,10 +96,10 @@ class PointTest extends TestCase
 
     public function testFieldValueStringEscaping()
     {
-        $expected = 'instance,host=server01,region=us-west spaces="string with spaces",doublequote="the \" is escaped"';
+        $expected = 'instance,host=server01,region=us-west spaces="string with spaces",doublequote="the \" is escaped",backslash="the \\\\ is escaped"';
         $point = $this->getPoint(null);
 
-        $point->setFields(['spaces' => 'string with spaces', 'doublequote' => 'the " is escaped']);
+        $point->setFields(['spaces' => 'string with spaces', 'doublequote' => 'the " is escaped', 'backslash' => 'the \\ is escaped']);
 
         $this->assertEquals($expected, (string) $point);
     }
