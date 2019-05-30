@@ -193,7 +193,7 @@ class Client
             return $driver->query();
 
         } catch (\Exception $e) {
-            throw new Exception('Query has failed', $e->getCode(), $e);
+            throw new Exception('Query has failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
