@@ -1,5 +1,5 @@
 {
-    "name": "influxdata/influxdb-php",
+    "name": "influxdb/influxdb-php",
     "description": "InfluxDB client library for PHP",
     "license": "MIT",
     "keywords": [
