@@ -338,6 +338,10 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
+#### 1.15.0
+- Added cURL driver support #122 (thanks @aldas)
+- Improved query error message #129 (thanks @andreasanta)
+
 #### 1.14.8
 - Merged #122
 
