@@ -338,6 +338,9 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 
 ## Changelog
 
+#### 1.14.8
+- Merged #122
+
 #### 1.14.7
 - Added offset in QueryBuilder (thanks @lifekent and @BentCoder)
 
