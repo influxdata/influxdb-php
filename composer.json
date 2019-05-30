@@ -43,7 +43,8 @@
         }
     },
     "suggest": {
-        "stefanotorresi/influxdb-php-async": "An asyncronous client for InfluxDB, implemented via ReactPHP."
+        "stefanotorresi/influxdb-php-async": "An asyncronous client for InfluxDB, implemented via ReactPHP.",
+        "ext-curl": "Curl extension, needed for Curl driver"
     },
     "scripts": {
         "test": "vendor/bin/phpunit",
