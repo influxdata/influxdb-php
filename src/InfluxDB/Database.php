@@ -17,6 +17,9 @@ use InfluxDB\Query\Builder as QueryBuilder;
  */
 class Database
 {
+    const ENDPOINT_QUERY = "/query";
+    const ENDPOINT_WRITE = "/write";
+
     /**
      * The name of the Database
      *
@@ -32,12 +35,14 @@ class Database
     /**
      * Precision constants
      */
-    const PRECISION_NANOSECONDS = 'n';
+    const PRECISION_NANOSECONDS = 'ns';
+    const PRECISION_MICROSECONDS_U = "µ";
     const PRECISION_MICROSECONDS = 'u';
     const PRECISION_MILLISECONDS = 'ms';
     const PRECISION_SECONDS = 's';
     const PRECISION_MINUTES = 'm';
     const PRECISION_HOURS = 'h';
+    const PRECISION_RFC3339 = "rfc3339";
 
     /**
      * Construct a database object
@@ -161,16 +166,18 @@ class Database
      */
     public function writePayload($payload, $precision = self::PRECISION_NANOSECONDS, $retentionPolicy = null)
     {
+        $precision = self::toValidQueryPrecision($precision, self::ENDPOINT_WRITE);
         try {
+            $query_params = ['db'=>$this->name, 'precision'=>$precision];
             $parameters = [
-                'url' => sprintf('write?db=%s&precision=%s', $this->name, $precision),
+                'url' => self::ENDPOINT_WRITE."?",
                 'database' => $this->name,
                 'method' => 'post'
             ];
             if ($retentionPolicy !== null) {
-                $parameters['url'] .= sprintf('&rp=%s', $retentionPolicy);
+                $query_params['rp'] = $retentionPolicy;
             }
-
+            $parameters['url'] .= http_build_query($query_params);
             return $this->client->write($parameters, $payload);
 
         } catch (Exception $e) {
@@ -218,9 +225,9 @@ class Database
      *
      * @return QueryBuilder
      */
-    public function getQueryBuilder()
+    public function getQueryBuilder(array $parameters=[])
     {
-        return new QueryBuilder($this);
+        return new QueryBuilder($this, $parameters);
     }
 
     /**
@@ -253,4 +260,26 @@ class Database
 
         return $query;
     }
+
+    public static function validatePrecision($strPrecision) {
+        return (in_array($strPrecision, [self::PRECISION_HOURS, self::PRECISION_MINUTES, self::PRECISION_SECONDS, self::PRECISION_MILLISECONDS, self::PRECISION_MICROSECONDS, self::PRECISION_MICROSECONDS_U, self::PRECISION_NANOSECONDS, self::PRECISION_RFC3339], TRUE) ? TRUE : FALSE);
+    } // fin validatePrecision()
+
+    public static function toValidQueryPrecision($strPrecision, $type=self::ENDPOINT_QUERY) {
+        switch ($type) {
+            case self::ENDPOINT_QUERY:
+                switch ($strPrecision) {
+                    case self::PRECISION_RFC3339: return NULL;
+                    case self::PRECISION_MICROSECONDS_U: return self::PRECISION_MICROSECONDS;
+                } // fin switch
+                break;
+            case self::ENDPOINT_WRITE:
+                switch ($strPrecision) {
+                    case self::PRECISION_RFC3339: return self::PRECISION_NANOSECONDS;
+                    case self::PRECISION_MICROSECONDS_U: return self::PRECISION_MICROSECONDS;
+                } // fin switch
+                break;
+        } // fin switch
+        return $strPrecision;
+    } // fin toValidQueryPrecision()
 }

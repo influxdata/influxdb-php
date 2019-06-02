@@ -80,12 +80,15 @@ class Builder
      */
     protected $orderBy;
 
+    protected $parameters;
+
     /**
      * @param Database $db
      */
-    public function __construct(Database $db)
+    public function __construct(Database $db, array $parameters=[])
     {
         $this->db = $db;
+        $this->parameters = $parameters;
     }
 
     /**
@@ -297,7 +300,7 @@ class Builder
      */
     public function getResultSet()
     {
-        return  $this->db->query($this->parseQuery());
+        return  $this->db->query($this->parseQuery(), $this->parameters);
     }
 
     /**
