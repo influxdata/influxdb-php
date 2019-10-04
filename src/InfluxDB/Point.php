@@ -235,9 +235,13 @@ class Point
     {
         $strParts = [];
 
+        $origLocale = setlocale(LC_NUMERIC, 0);
+        // Use the POSIX locale which defines the `decimal_point` separator as `.`
+        setlocale(LC_NUMERIC, 'POSIX');
         foreach ($arr as $key => $value) {
             $strParts[] = sprintf('%s=%s', $key, $value);
         }
+        setlocale(LC_NUMERIC, $origLocale);
 
         return implode(',', $strParts);
     }
