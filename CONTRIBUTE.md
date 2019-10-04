@@ -26,18 +26,17 @@ We appreciate any efforts to help us writing this library. You can contribute in
 In order for your pull requests to get accepted we hold all the code to the following criteria:
 
 * PSR-1/PSR-2 compliant
-* Do not use left hand conditions such as false == $something
+* Do not use left hand conditions such as `false == $something`, rather use `$something === false`
 * New features need to be documented
 * Breaking changes should be well highlighted and explained in the PR
 * Only short-array syntax should be used for arrays
-* Use regular string concatenation for single-variable strings, and sprintf for multi-variable strings
+* Use regular string concatenation for single-variable strings, and `sprintf` for multi-variable strings
 * Do not align variable assignments
 
 The following is optional but encouraged:
 
 * Code should be documented
 * Code should be unit tested
-* Do not write conditions like false === $something, rather $something === false.
 
 ## Special thanks
 
