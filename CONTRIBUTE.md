@@ -26,7 +26,7 @@ We appreciate any efforts to help us writing this library. You can contribute in
 In order for your pull requests to get accepted we hold all the code to the following criteria:
 
 * PSR-1/PSR-2 compliant
-* Do not use left hand conditions such as `false == $something`, rather use `$something === false`
+* Do not use left hand conditions such as `false === $something`, rather use `$something === false`
 * New features need to be documented
 * Breaking changes should be well highlighted and explained in the PR
 * Only short-array syntax should be used for arrays
