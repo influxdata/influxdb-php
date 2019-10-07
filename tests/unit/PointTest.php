@@ -18,6 +18,25 @@ class PointTest extends TestCase
     }
 
     /**
+     * Check that locales that use a non-dot separator sends a valid line format
+     */
+    public function testPointLocaleStringRepresentation()
+    {
+        $origLocale = setlocale(LC_ALL, 0);
+        // `de_DE` uses a comma `decimal_point` separator, ie `(string)1.11` becomes `"1,11"`
+        setlocale(LC_ALL, 'de_DE');
+
+        $expected = 'instance,host=server01,region=us-west cpucount=10i,free=1i,test="string",bool=false,value=1.11 1440494531376778481';
+
+        $point = $this->getPoint('1440494531376778481');
+
+        $stringPoint = (string)$point;
+        setlocale(LC_ALL, $origLocale);
+
+        $this->assertEquals($expected, $stringPoint);
+    }
+
+    /**
      * Check if the Point class throw an exception when invalid timestamp are given.
      *
      * @dataProvider wrongTimestampProvider
