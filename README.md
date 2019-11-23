@@ -46,7 +46,7 @@ $client = $database->getClient();
 
 **Important:** don't forget to `urlencode()` the password (and username for that matter) when using a DSN,
 especially if it contains non-alphanumeric characters. Not doing so might cause exceptions to be thrown.
-  
+
 ### Reading data
 
 To fetch records from InfluxDB you can do a query directly on a database:
@@ -101,6 +101,16 @@ In production if you are querying InfluxDB to generate a response to a web or AP
 ```php
 // Fetch the database using a 5 second time out
 $database = InfluxDB\Client::fromDSN(sprintf('influxdb://user:pass@%s:%s/%s', $host, $port, $dbname), 5);
+```
+
+### Reading large data sets
+
+Reading large data sets may exceed available memory. To overcome this obstacle, use the iterate() method to return each point without loading them all first into memory.  This method supports only a single measurement, however, you can manually target another measurement if necessary.
+
+```php
+foreach($result->iterate() as $index=>$point) {
+    // Process each $point as needed.
+}
 ```
 
 ### Writing data
@@ -280,6 +290,27 @@ $result = $client->listUsers();
 $result = $client->listDatabases();
 ```
 
+### Other Database functions
+
+Several additional database functions are available:
+
+```php
+// list measurements
+$result = $database->listMeasurements();
+
+// list all field keys
+$result = $database->listFieldKeys();
+
+// list field keys for a single measurement
+$result = $database->listFieldKeys('yourMeasurement');
+
+// list all tag keys
+$result = $database->listTagKeys();
+
+// list tag keys for a single measurement
+$result = $database->listTagKeys('yourMeasurement');
+```
+
 ### Admin functionality
 
 You can use the client's $client->admin functionality to administer InfluxDB via the API.
@@ -371,10 +402,10 @@ $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
 * Fixed tag with Boolean/Null value trigger parse error
 
 #### 1.4.1
-* Fixed bug: Escape field values as per line protocol. 
+* Fixed bug: Escape field values as per line protocol.
 
 #### 1.4.0
-* Updating Influx Database with support for writing direct payloads, thanks @virgofx 
+* Updating Influx Database with support for writing direct payloads, thanks @virgofx
 
 #### 1.3.1
 * Added ability to write data to a specific retention policy, thanks @virgofx !

@@ -206,6 +206,63 @@ class Database
     }
 
     /**
+     * @return array
+     */
+    public function listMeasurements():array
+    {
+        return array_map(function($m){
+            return $m[0];
+        }, $this->query('SHOW MEASUREMENTS')->getSeries()[0]['values']);
+    }
+
+    /**
+     * @param $measurement
+     * @return array
+     * @throws Exception
+     */
+    public function listFieldKeys(?string $measurement=null):array
+    {
+        $rs = $measurement
+        ?$this->query(sprintf('SHOW FIELD KEYS FROM "%s"', $measurement))->getSeries()
+        :$this->query('SHOW FIELD KEYS')->getSeries();
+        $arr=[];
+        foreach($rs as $m) {
+            $arr[$m['name']]=[];
+            foreach($m['values'] as $v) {
+                $arr[$m['name']][$v[0]]=$v[1];
+            }
+        }
+        if($measurement) {
+            if(!isset($arr[$measurement])) throw new Exception("Measurement $measurement does not exist.");
+            return $arr[$measurement];
+        }
+        else return $arr;
+    }
+
+    /**
+     * @param $measurement
+     * @return array
+     * @throws Exception
+     */
+    public function listTagKeys(?string $measurement=null):array
+    {
+        $rs = $measurement
+        ?$this->query(sprintf('SHOW TAG KEYS FROM "%s"', $measurement))->getSeries()
+        :$this->query('SHOW TAG KEYS')->getSeries();
+        $arr=[];
+        foreach($rs as $m) {
+            $arr[$m['name']]=array_map(function($v){
+                return $v[0];
+                }, $m['values']);
+        }
+        if($measurement) {
+            if(!isset($arr[$measurement])) throw new Exception("Measurement $measurement does not exist.");
+            return $arr[$measurement];
+        }
+        else return $arr;
+    }
+
+    /**
      * Drop this database
      */
     public function drop()

@@ -136,8 +136,9 @@ class Curl implements DriverInterface, QueryDriverInterface
      */
     public function query()
     {
-        $response = $this->execute($this->parameters['url'], $this->getCurlOptions());
-        return new ResultSet($response);
+        $stream=fopen('php://temp', 'w+');
+        $this->execute($this->parameters['url'], $this->getCurlOptions() + [CURLOPT_FILE => $stream]);
+        return new ResultSet($stream);
     }
 
     protected function execute($url, $curlOptions = [])
@@ -145,25 +146,27 @@ class Curl implements DriverInterface, QueryDriverInterface
         $this->lastRequestInfo = null;
         $ch = curl_init();
 
-        foreach ($curlOptions as $option => $value) {
-            curl_setopt($ch, $option, $value);
+        $curlOptions=[
+            CURLOPT_URL => $this->dsn . '/' . $url,
+            CURLOPT_RETURNTRANSFER => true, /* CURLOPT_FILE must be set after CURLOPT_RETURNTRANSFER */
+            CURLOPT_HEADER => 0,
+            CURLOPT_BUFFERSIZE => 256,
+        ] + $curlOptions;
+
+        curl_setopt_array( $ch, $curlOptions);
+
+        if(isset($curlOptions[CURLOPT_FILE])) {
+            curl_exec($ch);
+            rewind($curlOptions[CURLOPT_FILE]);
         }
-
-        curl_setopt($ch, CURLOPT_URL, $this->dsn . '/' . $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-        $result = curl_exec($ch);
-        $this->lastRequestInfo = curl_getinfo($ch);
-
-        if ($result === false) {
+        elseif (curl_exec($ch) === false) {
             // in case of total failure - socket/port is closed etc
             throw new Exception('Request failed! curl_errno: ' . curl_errno($ch));
         }
 
+        $this->lastRequestInfo = curl_getinfo($ch);
 
         curl_close($ch);
-
-        return $result;
     }
 
     /**

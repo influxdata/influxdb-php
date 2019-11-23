@@ -7,6 +7,7 @@ namespace InfluxDB\Driver;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\StreamWrapper;
 use InfluxDB\ResultSet;
 
 /**
@@ -86,25 +87,13 @@ class Guzzle implements DriverInterface, QueryDriverInterface
 
     /**
      * @throws \Exception
-     * @return ResultSet
+     * @return stream
      */
     public function query()
     {
         $response = $this->httpClient->get($this->parameters['url'], $this->getRequestParameters());
 
-        $raw = (string) $response->getBody();
-
-        return $this->asResultSet($raw);
-    }
-
-    /**
-     * @param $raw
-     * @return ResultSet
-     * @throws \InfluxDB\Client\Exception
-     */
-    protected function asResultSet($raw)
-    {
-        return new ResultSet($raw);
+        return new ResultSet(StreamWrapper::getResource($response->getBody()));
     }
 
     /**

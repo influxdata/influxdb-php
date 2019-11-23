@@ -3,6 +3,8 @@
 namespace InfluxDB;
 
 use InfluxDB\Client\Exception as ClientException;
+use JsonMachine\JsonMachine;
+use JsonMachine\StreamBytes;
 
 /**
  * Class ResultSet
@@ -12,55 +14,58 @@ use InfluxDB\Client\Exception as ClientException;
  */
 class ResultSet
 {
+
     /**
      * @var array|mixed
      */
-    protected $parsedResults = [];
+    private $parsedResults;
 
     /**
-     * @var string
+     * @var stream
      */
-    protected $rawResults = '';
+    private $stream;
 
     /**
-     * @param string $raw
-     * @throws \InvalidArgumentException
-     * @throws ClientException
+     * @param stream $stream
      */
-    public function __construct($raw)
+    public function __construct($stream)
     {
-        $this->rawResults = $raw;
-        $this->parsedResults = json_decode((string)$raw, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \InvalidArgumentException('Invalid JSON');
-        }
-
-        $this->validate();
+        $this->stream = $stream;
     }
 
     /**
+     * @throws \InvalidArgumentException
+     * @throws ClientException
+     * @return array $parsedResults
+     */
+    private function getParsedResults()
+    {
+        if(is_null($this->parsedResults)) {
+            $this->parsedResults=json_decode(stream_get_contents($this->stream), true)['results'];
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \InvalidArgumentException('Invalid JSON');
+            }
+            $this->validate($this->parsedResults);
+        }
+
+        return $this->parsedResults;
+    }
+
+    /**
+     * @param array $parsedResults
      * @throws ClientException
      */
-    protected function validate()
+    private function validate($parsedResults)
     {
         // There was an error in the query thrown by influxdb
-        if (isset($this->parsedResults['error'])) {
-            throw new ClientException($this->parsedResults['error']);
+        if (isset($parsedResults['error'])) {
+            throw new ClientException($parsedResults['error']);
         }
 
         // Check if there are errors in the first serie
-        if (isset($this->parsedResults['results'][0]['error'])) {
-            throw new ClientException($this->parsedResults['results'][0]['error']);
+        if (isset($parsedResults['results'][0]['error'])) {
+            throw new ClientException($parsedResults['results'][0]['error']);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getRaw()
-    {
-        return $this->rawResults;
     }
 
     /**
@@ -101,7 +106,7 @@ class ResultSet
      */
     public function getSeries($queryIndex = 0)
     {
-        $results = $this->parsedResults['results'];
+        $results = $this->getParsedResults();
 
         if ($queryIndex !== null && !array_key_exists($queryIndex, $results)) {
             throw new \InvalidArgumentException('Invalid statement index provided');
@@ -170,5 +175,27 @@ class ResultSet
         }
 
         return $points;
+    }
+
+    /**
+     * Used to obtain large result sets.
+     * @param  int $measurement
+     * @throws JsonMachine\Exception\SyntaxError
+     * @yield array
+     */
+    public function iterate(int $measurement=0)
+    {
+        $json_pointer="/results/$measurement/series";
+        rewind($this->stream);
+        foreach(JsonMachine::fromStream($this->stream, $json_pointer) as $series) {
+            foreach($series['values'] as $point) {
+                $points = array_combine($series['columns'], $point);
+                if (!empty($series['tags'])) {
+                    $points += $series['tags'];
+                }
+                yield $points;
+            }
+        }
+        rewind($this->stream);
     }
 }
