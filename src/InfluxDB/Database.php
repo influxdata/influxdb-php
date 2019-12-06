@@ -8,6 +8,7 @@ use InfluxDB\Exception as InfluxDBException;
 use InfluxDB\Database\Exception as DatabaseException;
 use InfluxDB\Database\RetentionPolicy;
 use InfluxDB\Query\Builder as QueryBuilder;
+use InfluxDB\Query\QueryBuilder as QueryBuilder2;
 
 /**
  * Class Database
@@ -278,6 +279,16 @@ class Database
     public function getQueryBuilder()
     {
         return new QueryBuilder($this);
+    }
+
+    /**
+     * Retrieve the optional second query builder
+     *
+     * @return QueryBuilder
+     */
+    public function getQueryBuilder2()
+    {
+        return new QueryBuilder2($this);
     }
 
     /**
