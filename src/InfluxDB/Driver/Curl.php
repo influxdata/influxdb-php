@@ -138,6 +138,7 @@ class Curl implements DriverInterface, QueryDriverInterface
     {
         $stream=fopen('php://temp', 'w+');
         $this->execute($this->parameters['url'], $this->getCurlOptions() + [CURLOPT_FILE => $stream]);
+        rewind($stream);
         return new ResultSet($stream);
     }
 

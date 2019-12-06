@@ -21,16 +21,34 @@ class ResultSet
     private $parsedResults;
 
     /**
+     * @var array|mixed
+     */
+    private $parsedResultsMap;
+
+    /**
      * @var stream
      */
     private $stream;
 
     /**
+     * @var int
+     */
+    private $maxParseSize;
+
+    /**
+     * @var int
+     */
+    private $streamSize;
+
+    const MAX_PARSE_SIZE = 1000000;
+
+    /**
      * @param stream $stream
      */
-    public function __construct($stream)
+    public function __construct($stream, ?int $maxParseSize=null)
     {
         $this->stream = $stream;
+        $this->maxParseSize = $maxParseSize??self::MAX_PARSE_SIZE;
     }
 
     /**
@@ -47,8 +65,18 @@ class ResultSet
             }
             $this->validate($this->parsedResults);
         }
-
         return $this->parsedResults;
+    }
+
+    private function getParsedResultsMap()
+    {
+        if(is_null($this->parsedResultsMap)) {
+            $this->parsedResultsMap=[];
+            foreach($this->getParsedResults() as $index=>$values) {
+                $this->parsedResultsMap[$values['time']]=$index;
+            }
+        }
+        return $this->parsedResultsMap;
     }
 
     /**
@@ -185,17 +213,58 @@ class ResultSet
      */
     public function iterate(int $measurement=0)
     {
-        $json_pointer="/results/$measurement/series";
-        rewind($this->stream);
-        foreach(JsonMachine::fromStream($this->stream, $json_pointer) as $series) {
-            foreach($series['values'] as $point) {
-                $points = array_combine($series['columns'], $point);
-                if (!empty($series['tags'])) {
-                    $points += $series['tags'];
-                }
-                yield $points;
+        if($this->getResponseSize() <= $this->maxParseSize) {
+            foreach($this->getPoints() as $point) {
+                yield $point;
             }
         }
-        rewind($this->stream);
+        else {
+            $json_pointer="/results/$measurement/series";
+            foreach(JsonMachine::fromStream($this->stream, $json_pointer) as $series) {
+                foreach($series['values'] as $point) {
+                    $point = array_combine($series['columns'], $point);
+                    if (!empty($series['tags'])) {
+                        $point += $series['tags'];
+                    }
+                    yield $point;
+                }
+            }
+            rewind($this->stream);
+        }
+    }
+
+    public function getByTime(string $time, int $measurement=0):?array
+    {
+        if(\DateTime::createFromFormat(\DateTime::RFC3339, $time) === FALSE) {
+            throw new \InvalidArgumentException("'$time' is not a valid RFC3339 time");
+        }
+        if($this->getResponseSize() <= $this->maxParseSize) {
+            $point = $this->getParsedResultsMap()[$time]??null;
+        }
+        else {
+            $json_pointer="/results/$measurement/series";
+            $point=null;
+            foreach(JsonMachine::fromStream($this->stream, $json_pointer) as $series) {
+                foreach($series['values'] as $p) {
+                    if($time===$p[0]) {
+                        $p = array_combine($series['columns'], $p);
+                        if (!empty($series['tags'])) {
+                            $p += $series['tags'];
+                        }
+                        $point=$p;
+                        break(2);
+                    }
+                }
+            }
+            rewind($this->stream);
+        }
+        return $point;
+    }
+
+    public function getResponseSize():int
+    {
+        //rewind($this->stream);
+        if(!$this->streamSize) $this->streamSize = fstat($this->stream)['size'];
+        return $this->streamSize;
     }
 }
