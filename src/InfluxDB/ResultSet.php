@@ -21,6 +21,11 @@ class ResultSet
     private $parsedResults;
 
     /**
+     * @var string
+     */
+    protected $rawResults = '';
+
+    /**
      * @var array|mixed
      */
     private $parsedResultsMap;
@@ -59,7 +64,8 @@ class ResultSet
     private function getParsedResults()
     {
         if(is_null($this->parsedResults)) {
-            $this->parsedResults=json_decode(stream_get_contents($this->stream), true)['results'];
+            $this->rawResults=stream_get_contents($this->stream);
+            $this->parsedResults=json_decode($this->rawResults, true)['results'];
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new \InvalidArgumentException('Invalid JSON');
             }
@@ -94,6 +100,14 @@ class ResultSet
         if (isset($parsedResults['results'][0]['error'])) {
             throw new ClientException($parsedResults['results'][0]['error']);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getRaw()
+    {
+        return $this->rawResults;
     }
 
     /**
