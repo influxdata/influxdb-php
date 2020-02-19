@@ -91,7 +91,7 @@ You can get the last executed query from the client:
 $lastQuery = $client->getLastQuery();
 
 // or access the static variable directly:
-$lastQuery = Client::lastQuery;
+$lastQuery = Client::$lastQuery;
 ```
 
 ### Reading data using a timeout
