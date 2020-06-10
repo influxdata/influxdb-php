@@ -4,6 +4,8 @@
 [![Code Climate](https://codeclimate.com/github/influxdata/influxdb-php/badges/gpa.svg)](https://codeclimate.com/github/influxdata/influxdb-php)
 [![Test Coverage](https://codeclimate.com/github/influxdata/influxdb-php/badges/coverage.svg)](https://codeclimate.com/github/influxdata/influxdb-php/coverage)
 
+#### Note: This library is for use with InfluxDB 1.x. For connecting to InfluxDB 2.x instances, please use the [influxdb-client-php](https://github.com/influxdata/influxdb-client-php) client.
+
 ### Overview
 
 A easy to use library for using InfluxDB with PHP. Maintained by [@thecodeassassin](https://github.com/thecodeassassin), [@gianarb](https://github.com/gianarb).
