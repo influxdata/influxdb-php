@@ -29,6 +29,9 @@ class Curl implements DriverInterface, QueryDriverInterface
     /** @var array */
     protected $lastRequestInfo;
 
+    /** @var mixed */
+    protected $lastResponse;
+
     /**
      * Build the Curl driver from a dsn
      * Examples:
@@ -124,7 +127,13 @@ class Curl implements DriverInterface, QueryDriverInterface
         $statusCode = $this->lastRequestInfo['http_code'];
 
         if (!in_array($statusCode, [200, 204], true)) {
-            throw new Exception('Request failed with HTTP Code ' . $statusCode);
+            $json = json_decode($this->lastResponse);
+
+            if (json_last_error() == JSON_ERROR_NONE && isset($json->error)) {
+                throw new Exception('Request failed with HTTP Code ' . $statusCode . ': ' . $json->error);
+            } else {
+                throw new Exception('Request failed with HTTP Code ' . $statusCode);
+            }
         }
 
         return true;
@@ -152,18 +161,17 @@ class Curl implements DriverInterface, QueryDriverInterface
         curl_setopt($ch, CURLOPT_URL, $this->dsn . '/' . $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-        $result = curl_exec($ch);
+        $this->lastResponse = curl_exec($ch);
         $this->lastRequestInfo = curl_getinfo($ch);
 
-        if ($result === false) {
+        if ($this->lastResponse === false) {
             // in case of total failure - socket/port is closed etc
             throw new Exception('Request failed! curl_errno: ' . curl_errno($ch));
         }
 
-
         curl_close($ch);
 
-        return $result;
+        return $this->lastResponse;
     }
 
     /**
