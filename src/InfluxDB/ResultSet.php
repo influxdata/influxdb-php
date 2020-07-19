@@ -3,6 +3,8 @@
 namespace InfluxDB;
 
 use InfluxDB\Client\Exception as ClientException;
+use JsonMachine\JsonMachine;
+use JsonMachine\StreamBytes;
 
 /**
  * Class ResultSet
@@ -12,10 +14,11 @@ use InfluxDB\Client\Exception as ClientException;
  */
 class ResultSet
 {
+
     /**
      * @var array|mixed
      */
-    protected $parsedResults = [];
+    private $parsedResults;
 
     /**
      * @var string
@@ -23,35 +26,79 @@ class ResultSet
     protected $rawResults = '';
 
     /**
-     * @param string $raw
-     * @throws \InvalidArgumentException
-     * @throws ClientException
+     * @var array|mixed
      */
-    public function __construct($raw)
+    private $parsedResultsMap;
+
+    /**
+     * @var stream
+     */
+    private $stream;
+
+    /**
+     * @var int
+     */
+    private $maxParseSize;
+
+    /**
+     * @var int
+     */
+    private $streamSize;
+
+    const MAX_PARSE_SIZE = 1000000;
+
+    /**
+     * @param stream $stream
+     */
+    public function __construct($stream, ?int $maxParseSize=null)
     {
-        $this->rawResults = $raw;
-        $this->parsedResults = json_decode((string)$raw, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \InvalidArgumentException('Invalid JSON');
-        }
-
-        $this->validate();
+        $this->stream = $stream;
+        $this->maxParseSize = $maxParseSize??self::MAX_PARSE_SIZE;
     }
 
     /**
+     * @throws \InvalidArgumentException
+     * @throws ClientException
+     * @return array $parsedResults
+     */
+    private function getParsedResults()
+    {
+        if(is_null($this->parsedResults)) {
+            $this->rawResults=stream_get_contents($this->stream);
+            $this->parsedResults=json_decode($this->rawResults, true)['results'];
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \InvalidArgumentException('Invalid JSON');
+            }
+            $this->validate($this->parsedResults);
+        }
+        return $this->parsedResults;
+    }
+
+    private function getParsedResultsMap()
+    {
+        if(is_null($this->parsedResultsMap)) {
+            $this->parsedResultsMap=[];
+            foreach($this->getParsedResults() as $index=>$values) {
+                $this->parsedResultsMap[$values['time']]=$index;
+            }
+        }
+        return $this->parsedResultsMap;
+    }
+
+    /**
+     * @param array $parsedResults
      * @throws ClientException
      */
-    protected function validate()
+    private function validate($parsedResults)
     {
         // There was an error in the query thrown by influxdb
-        if (isset($this->parsedResults['error'])) {
-            throw new ClientException($this->parsedResults['error']);
+        if (isset($parsedResults['error'])) {
+            throw new ClientException($parsedResults['error']);
         }
 
         // Check if there are errors in the first serie
-        if (isset($this->parsedResults['results'][0]['error'])) {
-            throw new ClientException($this->parsedResults['results'][0]['error']);
+        if (isset($parsedResults['results'][0]['error'])) {
+            throw new ClientException($parsedResults['results'][0]['error']);
         }
     }
 
@@ -101,7 +148,7 @@ class ResultSet
      */
     public function getSeries($queryIndex = 0)
     {
-        $results = $this->parsedResults['results'];
+        $results = $this->getParsedResults();
 
         if ($queryIndex !== null && !array_key_exists($queryIndex, $results)) {
             throw new \InvalidArgumentException('Invalid statement index provided');
@@ -170,5 +217,68 @@ class ResultSet
         }
 
         return $points;
+    }
+
+    /**
+     * Used to obtain large result sets.
+     * @param  int $measurement
+     * @throws JsonMachine\Exception\SyntaxError
+     * @yield array
+     */
+    public function iterate(int $measurement=0)
+    {
+        if($this->getResponseSize() <= $this->maxParseSize) {
+            foreach($this->getPoints() as $point) {
+                yield $point;
+            }
+        }
+        else {
+            $json_pointer="/results/$measurement/series";
+            foreach(JsonMachine::fromStream($this->stream, $json_pointer) as $series) {
+                foreach($series['values'] as $point) {
+                    $point = array_combine($series['columns'], $point);
+                    if (!empty($series['tags'])) {
+                        $point += $series['tags'];
+                    }
+                    yield $point;
+                }
+            }
+            rewind($this->stream);
+        }
+    }
+
+    public function getByTime(string $time, int $measurement=0):?array
+    {
+        if(\DateTime::createFromFormat(\DateTime::RFC3339, $time) === FALSE) {
+            throw new \InvalidArgumentException("'$time' is not a valid RFC3339 time");
+        }
+        if($this->getResponseSize() <= $this->maxParseSize) {
+            $point = $this->getParsedResultsMap()[$time]??null;
+        }
+        else {
+            $json_pointer="/results/$measurement/series";
+            $point=null;
+            foreach(JsonMachine::fromStream($this->stream, $json_pointer) as $series) {
+                foreach($series['values'] as $p) {
+                    if($time===$p[0]) {
+                        $p = array_combine($series['columns'], $p);
+                        if (!empty($series['tags'])) {
+                            $p += $series['tags'];
+                        }
+                        $point=$p;
+                        break(2);
+                    }
+                }
+            }
+            rewind($this->stream);
+        }
+        return $point;
+    }
+
+    public function getResponseSize():int
+    {
+        //rewind($this->stream);
+        if(!$this->streamSize) $this->streamSize = fstat($this->stream)['size'];
+        return $this->streamSize;
     }
 }

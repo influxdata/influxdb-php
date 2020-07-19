@@ -16,7 +16,8 @@ interface QueryDriverInterface
 {
 
     /**
-     * @return ResultSet
+     * @throws \Exception
+     * @return stream
      */
     public function query();
 }
