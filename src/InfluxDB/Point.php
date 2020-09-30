@@ -52,8 +52,14 @@ class Point
         if (empty($measurement)) {
             throw new DatabaseException('Invalid measurement name provided');
         }
+        
+        if ($timestamp && !$this->isValidTimeStamp($timestamp)) {
+            throw new DatabaseException(sprintf('%s is not a valid timestamp', $timestamp));
+        }
 
         $this->measurement = (string) $measurement;
+        $this->timestamp = $timestamp;
+        
         $this->setTags($tags);
         $fields = $additionalFields;
 
@@ -62,12 +68,6 @@ class Point
         }
 
         $this->setFields($fields);
-
-        if ($timestamp && !$this->isValidTimeStamp($timestamp)) {
-            throw new DatabaseException(sprintf('%s is not a valid timestamp', $timestamp));
-        }
-
-        $this->timestamp = $timestamp;
     }
 
     /**
