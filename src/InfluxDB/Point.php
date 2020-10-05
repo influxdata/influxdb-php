@@ -36,7 +36,7 @@ class Point
      * local timestamp will be used
      *
      * @param  string $measurement
-     * @param  float  $value
+     * @param  ?float $value
      * @param  array  $tags
      * @param  array  $additionalFields
      * @param  int    $timestamp
