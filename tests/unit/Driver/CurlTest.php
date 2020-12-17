@@ -39,12 +39,15 @@ namespace InfluxDB\Test\unit\Driver {
     use InfluxDB\Driver\Curl;
     use InfluxDB\ResultSet;
     use PHPUnit\Framework\TestCase;
+    use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 
     /**
      * @requires extension curl
      */
     class CurlTest extends TestCase
     {
+        use ArraySubsetAsserts;
+
         static $MOCK_RESPONSE;
         static $MOCK_OPTS;
         static $MOCK_INFO;

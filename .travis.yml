@@ -11,8 +11,7 @@ env:
 matrix:
     fast_finish: true
     include:
-        # - php < 7.2 is over EOL. phpunit does not support it anymore so we just ignore this version
-        - php: 7.2
+        # - php: <7.3 is over EOL. phpunit does not support it anymore so we just ignore this version
         - php: 7.3
         - php: 7.4
         - php: 8.0
