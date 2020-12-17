@@ -68,20 +68,18 @@ class DatabaseTest extends AbstractTest
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testEmptyDatabaseName()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new Database(null, $this->mockClient);
     }
 
     /**
      * @group legacy
-     * @expectedException \PHPUnit\Framework\Error\Deprecated
      */
     public function testIfNotExistsDeprecation()
     {
+        $this->expectDeprecation();
         $this->database->create(null, true);
     }
 

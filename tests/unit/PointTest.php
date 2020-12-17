@@ -40,10 +40,10 @@ class PointTest extends TestCase
      * Check if the Point class throw an exception when invalid timestamp are given.
      *
      * @dataProvider wrongTimestampProvider
-     * @expectedException \InfluxDB\Database\Exception
      */
     public function testPointWrongTimestamp($timestamp)
     {
+        $this->expectException(\InfluxDB\Database\Exception::class);
         $this->getPoint($timestamp);
     }
 
