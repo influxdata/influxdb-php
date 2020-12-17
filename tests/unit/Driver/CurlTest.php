@@ -49,7 +49,7 @@ namespace InfluxDB\Test\unit\Driver {
         static $MOCK_OPTS;
         static $MOCK_INFO;
 
-        public function setUp()
+        public function setUp(): void
         {
             parent::setUp();
 

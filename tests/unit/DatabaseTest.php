@@ -19,7 +19,7 @@ class DatabaseTest extends AbstractTest
      */
     protected $mockResultSet;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -78,7 +78,7 @@ class DatabaseTest extends AbstractTest
 
     /**
      * @group legacy
-     * @expectedException \PHPUnit_Framework_Error_Deprecated
+     * @expectedException \PHPUnit\Framework\Error\Deprecated
      */
     public function testIfNotExistsDeprecation()
     {

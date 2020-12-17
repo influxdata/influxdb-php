@@ -6,3 +6,4 @@ build/
 test.php
 .project
 clover.xml
+.phpunit.result.cache

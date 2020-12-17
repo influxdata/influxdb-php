@@ -13,7 +13,7 @@ class ResultSetTest extends TestCase
     /** @var ResultSet $resultSet */
     protected $multiQueryResultSet;
 
-    public function setUp()
+    public function setUp(): void
     {
         $resultJsonExample = file_get_contents(__DIR__ . '/json/result.example.json');
         $this->resultSet = new ResultSet($resultJsonExample);
