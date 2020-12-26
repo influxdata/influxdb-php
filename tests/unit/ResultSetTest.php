@@ -13,26 +13,23 @@ class ResultSetTest extends TestCase
     /** @var ResultSet $resultSet */
     protected $multiQueryResultSet;
 
-    public function setUp()
+    public function setUp(): void
     {
         $resultJsonExample = file_get_contents(__DIR__ . '/json/result.example.json');
         $this->resultSet = new ResultSet($resultJsonExample);
         $this->multiQueryResultSet = new ResultSet(file_get_contents(__DIR__ . '/json/result-multi-query.example.json'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testThrowsExceptionIfJSONisNotValid()
     {
         $invalidJSON = 'foo';
 
+        $this->expectException(\InvalidArgumentException::class);
         new ResultSet($invalidJSON);
     }
 
     /**
      * Throws Exception if something went wrong with influxDB
-     * @expectedException \InfluxDB\Exception
      */
     public function testThrowsInfluxDBException()
     {
@@ -43,15 +40,16 @@ class ResultSetTest extends TestCase
     "error": "Big error, many problems."
 }
 EOD;
+        $this->expectException(\InfluxDB\Exception::class);
         new ResultSet($errorResult);
     }
 
     /**
      * Throws Exception if something went wrong with influxDB after processing the query
-     * @expectedException \InfluxDB\Exception
      */
     public function testThrowsInfluxDBExceptionIfAnyErrorInSeries()
     {
+        $this->expectException(\InfluxDB\Exception::class);
         new ResultSet(file_get_contents(__DIR__ . '/json/result-error.example.json'));
     }
 
@@ -184,20 +182,17 @@ EOD;
 
     /**
      * Throws Exception if invalid query index is given
-     *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid statement index provided
      */
     public function testGetInvalidResultFromMultiStatementQuery()
     {
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid statement index provided');
         $this->multiQueryResultSet->getSeries(2);
     }
 
     /**
      * Throws Exception if Nth query resulted an error
-     *
-     * @expectedException \InfluxDB\Client\Exception
-     * @expectedExceptionMessage should trigger error
      */
     public function testGetErrorFromMultiStatementQuery()
     {
@@ -207,6 +202,8 @@ EOD;
 
         $resultSet = new ResultSet(json_encode($raw));
 
+        $this->expectException(\InfluxDB\Client\Exception::class);
+        $this->expectExceptionMessage('should trigger error');
         $resultSet->getSeries(1);
     }
 }

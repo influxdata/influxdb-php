@@ -136,27 +136,23 @@ class AdminTest extends AbstractTest
         $this->assertEquals($resultJson, $resultSet->getRaw());
     }
 
-    /**
-     * @expectedException \InfluxDB\Client\Exception
-     * @expectedExceptionMessage does not exists is not a valid privileges, allowed privileges: READ, WRITE, ALL
-     */
     public function testRevokeInvalidPrivilege()
     {
         $clientMock = $this->getClientMock();
         $adminClient = new Client\Admin($clientMock);
 
+        $this->expectException(\InfluxDB\Client\Exception::class);
+        $this->expectExceptionMessage('does not exists is not a valid privileges, allowed privileges: READ, WRITE, ALL');
         $adminClient->revoke('does not exists', 'smith', 'example_db');
     }
 
-    /**
-     * @expectedException \InfluxDB\Client\Exception
-     * @expectedExceptionMessage Only grant ALL cluster-wide privileges are allowed
-     */
     public function testRevokeAllWithoutGivingDatabase()
     {
         $clientMock = $this->getClientMock();
         $adminClient = new Client\Admin($clientMock);
 
+        $this->expectException(\InfluxDB\Client\Exception::class);
+        $this->expectExceptionMessage('Only grant ALL cluster-wide privileges are allowed');
         $adminClient->revoke(Admin::PRIVILEGE_READ, 'smith', null);
     }
 

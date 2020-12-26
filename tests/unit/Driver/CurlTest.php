@@ -39,17 +39,20 @@ namespace InfluxDB\Test\unit\Driver {
     use InfluxDB\Driver\Curl;
     use InfluxDB\ResultSet;
     use PHPUnit\Framework\TestCase;
+    use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 
     /**
      * @requires extension curl
      */
     class CurlTest extends TestCase
     {
+        use ArraySubsetAsserts;
+
         static $MOCK_RESPONSE;
         static $MOCK_OPTS;
         static $MOCK_INFO;
 
-        public function setUp()
+        public function setUp(): void
         {
             parent::setUp();
 
@@ -200,10 +203,6 @@ namespace InfluxDB\Test\unit\Driver {
 
         }
 
-        /**
-         * @expectedException \InfluxDB\Driver\Exception
-         * @expectedExceptionMessage Request failed with HTTP Code 500
-         */
         public function testIsSuccessThrowsExceptionOnHttpError()
         {
             $driver = new Curl('http://localhost:8086');
@@ -214,13 +213,11 @@ namespace InfluxDB\Test\unit\Driver {
 
             $driver->write(['data']);
 
+            $this->expectException(\InfluxDB\Driver\Exception::class);
+            $this->expectExceptionMessage('Request failed with HTTP Code 500');
             $driver->isSuccess();
         }
 
-        /**
-         * @expectedException \InfluxDB\Driver\Exception
-         * @expectedExceptionMessage Request failed! curl_errno: 999
-         */
         public function testRequestThrowsExceptionWhenResultIsMissing()
         {
             $driver = new Curl('http://localhost:8086');
@@ -228,6 +225,8 @@ namespace InfluxDB\Test\unit\Driver {
             static::$MOCK_RESPONSE = false;
             $driver->setParameters(['url' => 'write?something']);
 
+            $this->expectException(\InfluxDB\Driver\Exception::class);
+            $this->expectExceptionMessage('Request failed! curl_errno: 999');
             $driver->write(['data']);
         }
 

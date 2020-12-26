@@ -19,7 +19,7 @@ class DatabaseTest extends AbstractTest
      */
     protected $mockResultSet;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -68,20 +68,18 @@ class DatabaseTest extends AbstractTest
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testEmptyDatabaseName()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new Database(null, $this->mockClient);
     }
 
     /**
      * @group legacy
-     * @expectedException \PHPUnit_Framework_Error_Deprecated
      */
     public function testIfNotExistsDeprecation()
     {
+        $this->expectDeprecation();
         $this->database->create(null, true);
     }
 
