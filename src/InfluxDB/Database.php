@@ -70,12 +70,13 @@ class Database
      *
      * @param  string $query
      * @param  array  $params
+     * @param  string  $method
      * @return ResultSet
      * @throws Exception
      */
-    public function query($query, $params = [])
+    public function query($query, $params = [], $method = 'get')
     {
-        return $this->client->query($this->name, $query, $params);
+        return $this->client->query($this->name, $query, $params, $method);
     }
 
     /**
@@ -94,7 +95,7 @@ class Database
         try {
             $query = sprintf('CREATE DATABASE "%s"', $this->name);
 
-            $this->query($query);
+            $this->query($query, [], 'post');
 
             if ($retentionPolicy) {
                 $this->createRetentionPolicy($retentionPolicy);
@@ -114,7 +115,7 @@ class Database
      */
     public function createRetentionPolicy(RetentionPolicy $retentionPolicy)
     {
-        return $this->query($this->getRetentionPolicyQuery('CREATE', $retentionPolicy));
+        return $this->query($this->getRetentionPolicyQuery('CREATE', $retentionPolicy), [], 'post');
     }
 
     /**
@@ -193,7 +194,7 @@ class Database
      */
     public function alterRetentionPolicy(RetentionPolicy $retentionPolicy)
     {
-        $this->query($this->getRetentionPolicyQuery('ALTER', $retentionPolicy));
+        $this->query($this->getRetentionPolicyQuery('ALTER', $retentionPolicy), [], 'post');
     }
 
     /**
@@ -210,7 +211,7 @@ class Database
      */
     public function drop()
     {
-        $this->query(sprintf('DROP DATABASE "%s"', $this->name));
+        $this->query(sprintf('DROP DATABASE "%s"', $this->name), [], 'post');
     }
 
     /**
