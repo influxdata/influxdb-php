@@ -297,8 +297,9 @@ class Builder
      */
     public function getResultSet()
     {
-        return  $this->db->query($this->parseQuery());
+            return  $this->db->query($this->parseQuery(),$this->params ?? []);
     }
+    
 
     /**
      * @return string
@@ -346,5 +347,16 @@ class Builder
         }
 
         return $query;
+    }
+    /**
+     * Add query string parametr to query
+     *
+     * @param array $params
+     *
+     * @return $this
+     */
+    public function setQueryStringParameter(array $params){
+        $this->params=$params;
+        return $this;
     }
 }
