@@ -295,9 +295,9 @@ class Builder
      * @return ResultSet
      * @throws \Exception
      */
-    public function getResultSet()
+    public function getResultSet($params = [])
     {
-        return  $this->db->query($this->parseQuery());
+        return  $this->db->query($this->parseQuery(), $params);
     }
 
     /**
