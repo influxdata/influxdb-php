@@ -292,12 +292,13 @@ class Builder
     /**
      * Gets the result from the database (builds the query)
      *
+     * @param array $param
      * @return ResultSet
      * @throws \Exception
      */
-    public function getResultSet()
+    public function getResultSet(array $param = [])
     {
-        return  $this->db->query($this->parseQuery());
+        return $this->db->query($this->parseQuery(), $param);
     }
 
     /**
