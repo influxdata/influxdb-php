@@ -4,6 +4,7 @@ namespace InfluxDB;
 
 use InfluxDB\Client\Admin;
 use InfluxDB\Client\Exception as ClientException;
+use InfluxDB\Database;
 use InfluxDB\Driver\DriverInterface;
 use InfluxDB\Driver\Exception as DriverException;
 use InfluxDB\Driver\Guzzle;
@@ -88,6 +89,7 @@ class Client
      */
     protected $driver;
 
+    protected $precision = Database::PRECISION_NANOSECONDS;
 
     /**
      * Stores the last query that ran
@@ -114,7 +116,8 @@ class Client
         $ssl = false,
         $verifySSL = false,
         $timeout = 0,
-        $connectTimeout = 0
+        $connectTimeout = 0,
+        $precision=Database::PRECISION_NANOSECONDS
     ) {
         $this->host = (string) $host;
         $this->port = (int) $port;
@@ -123,7 +126,8 @@ class Client
         $this->timeout = (float) $timeout;
         $this->connectTimeout = (float) $connectTimeout;
         $this->verifySSL = (bool) $verifySSL;
-
+        if (!Database::validatePrecision($precision)) { throw new \Exception("Precisión inválida."); } // fin if
+        $this->precision = $precision;
         if ($ssl) {
             $this->scheme = 'https';
             $this->options['verify'] = $verifySSL;
@@ -171,9 +175,12 @@ class Client
         if ($database) {
             $parameters['db'] = $database;
         }
-
+        if (isset($parameters['epoch'])) {
+            if (!Database::validatePrecision($parameters['epoch'])) { throw new \Exception("Precisión inválida."); } // fin if
+            $parameters['epoch'] = Database::toValidQueryPrecision($parameters['epoch']);
+        } // fin if
         $parameters = [
-            'url' => 'query?' . http_build_query(array_merge(['q' => $query], $parameters)),
+            'url' => Database::ENDPOINT_QUERY.'?' . http_build_query(array_merge(['q' => $query, 'epoch'=>Database::toValidQueryPrecision($this->precision)], $parameters)),
             'database' => $database,
             'method' => 'get'
         ];
@@ -193,7 +200,7 @@ class Client
             return $driver->query();
 
         } catch (\Exception $e) {
-            throw new Exception('Query has failed: ' . $e->getMessage(), $e->getCode(), $e);
+            throw new Exception('Query has failed', $e->getCode(), $e);
         }
     }
 
@@ -267,7 +274,7 @@ class Client
      * @return Client|Database
      * @throws ClientException
      */
-    public static function fromDSN($dsn, $timeout = 0, $verifySSL = false, $connectTimeout = 0)
+    public static function fromDSN($dsn, $timeout = 0, $verifySSL = false, $connectTimeout = 0, $precision=Database::PRECISION_NANOSECONDS)
     {
         $connParams = parse_url($dsn);
 
@@ -300,7 +307,8 @@ class Client
             $ssl,
             $verifySSL,
             $timeout,
-            $connectTimeout
+            $connectTimeout,
+            $precision
         );
 
         // set the UDP driver when the DSN specifies UDP
