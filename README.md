@@ -1,3 +1,13 @@
+The v1 client libraries for InfluxDB were typically developed and maintained by
+community members. They have all now been succeeded by v2 client libraries.
+They are being archived it in favor of the v2 client library. See
+https://github.com/influxdata/influxdb-php/issues/171.
+
+If there are still users of this v1 client library, and they or somebody else
+are willing to keep them updated with security fixes at a minimum please reach
+out on the [Community Forums](https://community.influxdata.com/) or
+[InfluxData Slack](https://influxdata.com/slack).
+
 # influxdb-php
 ## InfluxDB client library for PHP
 [![Build Status](https://travis-ci.org/influxdata/influxdb-php.svg?branch=master)](https://travis-ci.org/influxdata/influxdb-php)
