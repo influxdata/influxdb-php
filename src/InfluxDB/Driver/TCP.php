@@ -10,14 +10,17 @@ namespace InfluxDB\Driver;
  *
  * @package InfluxDB\Driver
  */
-class UDP extends AbstractSocketDriver implements DriverInterface
+class TCP extends AbstractSocketDriver implements DriverInterface
 {
+
+    private $result;
+
     /**
      * {@inheritdoc}
      */
     public function isSuccess()
     {
-        return true;
+        return (bool) $this->result;
     }
 
     /**
@@ -25,9 +28,9 @@ class UDP extends AbstractSocketDriver implements DriverInterface
      */
     protected function createStream()
     {
-        $host = sprintf('udp://%s:%d', $this->config['host'], $this->config['port']);
+        $host = sprintf('tcp://%s:%d', $this->config['host'], $this->config['port']);
 
-        // stream the data using UDP and suppress any errors
+        // stream the data using TCP and suppress any errors
         $this->stream = @stream_socket_client($host);
     }
 
@@ -36,6 +39,6 @@ class UDP extends AbstractSocketDriver implements DriverInterface
      */
     protected function doWrite($data)
     {
-        @stream_socket_sendto($this->stream, $data);
+        $this->result = false !== @fwrite($this->stream, "$data\n");
     }
 }
