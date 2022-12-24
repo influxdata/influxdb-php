@@ -152,6 +152,8 @@ class Point
                 $field = sprintf('%di', $field);
             } elseif (is_string($field)) {
                 $field = $this->escapeFieldValue($field);
+            } elseif (is_float($field) || is_double($field)) {
+                $field = sprintf('%F', $field);
             } elseif (is_bool($field)) {
                 $field = ($field ? 'true' : 'false');
             } elseif (is_null($field)) {
