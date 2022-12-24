@@ -75,6 +75,10 @@ class UDP implements DriverInterface
             $this->createStream();
         }
 
+        if (!is_resource($this->stream)) {
+            return true;
+        }
+
         @stream_socket_sendto($this->stream, $data);
 
         return true;
