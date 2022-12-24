@@ -204,7 +204,13 @@ class Point
      */
     private function escapeFieldValue($value)
     {
-        $escapedValue = str_replace('"', '\"', $value);
+        $escapedValue = str_replace([
+            '\\',
+            '"'
+        ],[
+            '\\\\',
+            '\"'
+        ], $value);
         return sprintf('"%s"', $escapedValue);
     }
 
