@@ -155,12 +155,13 @@ class Client
      *
      * @param  string $database
      * @param  string $query
+     * @param  string $method
      * @param  array  $parameters
      *
      * @return ResultSet
      * @throws Exception
      */
-    public function query($database, $query, $parameters = [])
+    public function query($database, $query, $parameters = [], $method = 'get')
     {
         $driver = $this->getDriver();
 
@@ -175,7 +176,7 @@ class Client
         $parameters = [
             'url' => 'query?' . http_build_query(array_merge(['q' => $query], $parameters)),
             'database' => $database,
-            'method' => 'get'
+            'method' => $method
         ];
 
         // add authentication to the driver if needed
