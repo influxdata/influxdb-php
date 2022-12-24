@@ -81,6 +81,11 @@ class Builder
     protected $orderBy;
 
     /**
+     * @var string
+     */
+    protected $tz;
+
+    /**
      * @param Database $db
      */
     public function __construct(Database $db)
@@ -268,6 +273,20 @@ class Builder
     }
 
     /**
+     * Set the timezone
+     *
+     * @param string $timezone
+     *
+     * @return $this
+     */
+    public function tz($timezone)
+    {
+        $this->tz = $timezone;
+
+        return $this;
+    }
+
+    /**
      * Add retention policy to query
      *
      * @param string $rp
@@ -295,9 +314,9 @@ class Builder
      * @return ResultSet
      * @throws \Exception
      */
-    public function getResultSet()
+    public function getResultSet($params=[])
     {
-        return  $this->db->query($this->parseQuery());
+        return  $this->db->query($this->parseQuery(), $params);
     }
 
     /**
@@ -343,6 +362,14 @@ class Builder
 
         if ($this->offsetClause) {
             $query .= $this->offsetClause;
+        }
+
+        if (isset($this->tz)) {
+            //also add support for timezone offset
+            $tz = is_numeric(trim($this->tz,0))?
+                timezone_name_from_abbr('',$this->tz*3600,0):
+                $this->tz;
+            $query .= " tz('".$tz."')";
         }
 
         return $query;
